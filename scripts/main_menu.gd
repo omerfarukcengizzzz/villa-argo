@@ -1,12 +1,16 @@
 extends Control
 ## Host / Join menu. UI is built in code to keep the scene file trivial.
+## Command-line shortcuts (after "--", or per instance in Debug > Customize Run
+## Instances): "--host" hosts, "--join=IP" joins. Used once per launch.
 
-const WORLD_SCENE := "res://scenes/world.tscn"
+const GAME_SCENE := "res://scenes/game.tscn"
 
 var _ip_field: LineEdit
 var _host_button: Button
 var _join_button: Button
 var _status: Label
+
+static var _autostarted := false
 
 
 func _ready() -> void:
@@ -14,6 +18,19 @@ func _ready() -> void:
 	_build_ui()
 	multiplayer.connected_to_server.connect(_on_connected)
 	multiplayer.connection_failed.connect(_on_connection_failed)
+	_autostart.call_deferred()
+
+
+func _autostart() -> void:
+	if _autostarted:
+		return
+	_autostarted = true
+	for arg in OS.get_cmdline_user_args():
+		if arg == "--host":
+			_on_host_pressed()
+		elif arg.begins_with("--join="):
+			_ip_field.text = arg.trim_prefix("--join=")
+			_on_join_pressed()
 
 
 func _build_ui() -> void:
@@ -57,7 +74,7 @@ func _on_host_pressed() -> void:
 	if err != OK:
 		_status.text = "Could not host (error %d)" % err
 		return
-	get_tree().change_scene_to_file(WORLD_SCENE)
+	get_tree().change_scene_to_file(GAME_SCENE)
 
 
 func _on_join_pressed() -> void:
@@ -74,7 +91,7 @@ func _on_join_pressed() -> void:
 
 
 func _on_connected() -> void:
-	get_tree().change_scene_to_file(WORLD_SCENE)
+	get_tree().change_scene_to_file(GAME_SCENE)
 
 
 func _on_connection_failed() -> void:
