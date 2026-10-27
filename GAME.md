@@ -21,6 +21,8 @@ Each twin has abilities and information the other doesn't. Players must talk to 
 - **Levels:** each Door to Time = one level with its own look and puzzles.
 - **Ulysses' journal:** in-game UI that fills with maps, riddles and hints as you play.
 - **Pressure:** Oblivia's people chase the twins or race them to the next key.
+- **Story reference:** `docs/ulysses-moore-books-1-6-reference.md` covers characters, places, keys, puzzles and spoiler order
+  for books 1–6, with a confidence label on every claim. Check it before writing lore, and label anything invented as adaptation.
 
 ## Tech decisions
 - **Engine:** Godot 4 (GDScript). Chosen because scenes/scripts are plain text and work well with AI coding tools.
