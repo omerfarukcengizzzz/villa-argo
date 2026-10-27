@@ -1,6 +1,6 @@
 # Book 3 design: *The House of Mirrors* (Kilmore Cove)
 
-Draft for approval. Same conventions as books 1 and 2: every step cites the story reference (`docs/ulysses-moore-books-1-6-reference.md`, "ref") and is marked **canon** or **adaptation**.
+Approved (decisions at the end). Same conventions as books 1 and 2: every step cites the story reference (`docs/ulysses-moore-books-1-6-reference.md`, "ref") and is marked **canon** or **adaptation**.
 
 Book 3 is different from 1 and 2: **nobody goes through a Door** (ref B3, MEDIUM). It's an investigation at home. Kilmore Cove itself is the puzzle: missing from maps, no phone signal, a railway that leads nowhere, a statue of a king who never reigned (ref §3, HIGH: "plot mysteries, not mistakes to fix"). It ends at Peter Dedalus's **House of Mirrors**, where Oblivia slips through a Door to Venice.
 
@@ -78,9 +78,13 @@ The reference has the plot and the house's contents (illusions, machines, a ches
 2. **Pass B:** the House of Mirrors: split-view maze, owl clock, telephone, chess, the study (steps 7–11).
 3. **Pass C:** Oblivia: demolition race and the Lion Door (steps 12–13).
 
-## Open choices
+## Status
 
-1. **Split-view mirror house** (each twin sees a different house, neither fully true). Good, or too confusing?
-2. Step 5: **Jason's memory of the map** (he held it for ten seconds) as his private clue. OK?
-3. The **chess puzzle**: a single right move (simple) or a short sequence of moves (harder)?
-4. **The demolition race** in step 12 is invented excitement (the books just say Oblivia sends a demolition crew). Keep it, or make the ending a calmer scripted scene?
+- **Pass A done:** breakfast with Nestor starts book 3 and shares every journal entry so far; Jason gets his private memory of the map. `scripts/levels/kilmore_cove.gd` is now the whole village (the book 1 street and post office are unchanged): the square (statue of King William V, telephone box), Calypso's bookshop (atlases, A History of the Kings of England, the guide table), Miss Biggles's house and cats, the lighthouse and Minaxo, the railway to the boarded-up tunnel past the closed station, and the House of Mirrors (locked until Pass B). The checklist entry fills in as the four impossibilities are found; Calypso then gives Julia the guide; the marked landmarks are 3, 6 and 8 (any order); talking to Minaxo, Miss Biggles and Calypso afterwards gives the "Peter Dedalus" entry.
+
+## Decisions
+
+1. Split-view mirror house: yes.
+2. Jason's memory of the map as his private clue: yes.
+3. Chess: a short sequence of moves.
+4. The demolition race stays.

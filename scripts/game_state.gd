@@ -84,6 +84,19 @@ func add_journal(id: String, title: String, body: String, who := "both") -> void
 		_add_journal.rpc({"id": id, "title": title, "body": body, "who": who})
 
 
+## Adds the entry, or replaces its title, body and who if it exists (e.g. a
+## checklist that fills in as the twins go).
+func update_journal(id: String, title: String, body: String, who := "both") -> void:
+	assert(multiplayer.is_server())
+	_update_journal.rpc({"id": id, "title": title, "body": body, "who": who})
+
+
+## Makes every journal entry so far visible to both twins (they compare notes).
+func share_journal() -> void:
+	assert(multiplayer.is_server())
+	_share_journal.rpc()
+
+
 func send_snapshot(peer_id: int) -> void:
 	_apply_snapshot.rpc_id(peer_id, {"flags": flags, "inventory": inventory, "journal": journal})
 
@@ -113,6 +126,23 @@ func _add_journal(entry: Dictionary) -> void:
 	journal.append(entry)
 	changed.emit("journal")
 	journal_added.emit(entry)
+
+
+@rpc("authority", "call_local", "reliable")
+func _update_journal(entry: Dictionary) -> void:
+	for i in journal.size():
+		if journal[i]["id"] == entry["id"]:
+			journal[i] = entry
+			changed.emit("journal")
+			return
+	_add_journal(entry)
+
+
+@rpc("authority", "call_local", "reliable")
+func _share_journal() -> void:
+	for e in journal:
+		e["who"] = "both"
+	changed.emit("journal")
 
 
 @rpc("authority", "call_remote", "reliable")

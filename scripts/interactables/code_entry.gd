@@ -11,6 +11,9 @@ extends Interactable
 @export var question := "Your answer:"
 @export var wrong_text := "That doesn't make sense yet."
 @export var size := Vector3(0.8, 0.15, 0.6)
+## Compare letters and digits in any order (e.g. "the three numbers"). If the
+## answer is all digits, everything else typed is ignored ("8, 6 and 3").
+@export var any_order := false
 @export var color := Color(0.35, 0.22, 0.12)
 
 
@@ -54,12 +57,23 @@ func _handle_answer(peer_id: int, text: String) -> void:
 	var player := _validate(peer_id)
 	if player == null:
 		return
-	if _normalize(text) == _normalize(answer):
+	if _key(text) == _key(answer):
 		GameState.set_flag(solved_flag)
 		if on_used.is_valid():
 			on_used.call(player)
 	else:
 		Game.current.say(wrong_text, player.role)
+
+
+func _key(text: String) -> String:
+	var key := _normalize(text)
+	if any_order and _normalize(answer).is_valid_int():
+		key = "".join(Array(key.split("")).filter(func(c: String) -> bool: return c >= "0" and c <= "9"))
+	if any_order:
+		var chars := Array(key.split(""))
+		chars.sort()
+		key = "".join(chars)
+	return key
 
 
 static func _normalize(text: String) -> String:

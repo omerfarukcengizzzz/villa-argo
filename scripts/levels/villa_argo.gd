@@ -114,6 +114,9 @@ func _hear_footsteps() -> void:
 
 
 func _talk_nestor(_player: Node3D) -> void:
+	if GameState.get_flag("b2.home", false) and not GameState.get_flag("b3.started", false):
+		_breakfast()
+		return
 	if GameState.get_flag("argo.met_nestor", false):
 		return
 	GameState.set_flag("argo.met_nestor")
@@ -163,7 +166,9 @@ func _build_courtyard() -> void:
 		["storm.phase=chase", "After him! The brute's heading for the cliff!"],
 		["storm.phase=fallen", "Over the cliff? His sort always crawl out of the sea. Have you got the key back?"],
 		["b2.split & argo_door.open", "You opened it from this side... Then we wait for the boys."],
-		["b2.home", "Back, are you? All three of you, sunburnt in a storm. I won't ask."],
+		["b2.home", "Back, are you? All three of you, sunburnt in a storm. I won't ask. Sit down, there's breakfast."],
+		["b3.started", "Off to the village, are you? Mind the cliff road."],
+		["b3.dedalus", "Dedalus... Yes, I knew him. I knew all of them, once. That was a long time ago."],
 	]
 	nestor.stations = [["", Vector3(4, 1, 17)], ["b2.split", Vector3(1.5, 1, 7)]]
 	nestor.on_used = _talk_nestor
@@ -434,6 +439,22 @@ func _add_cracked_ledge(top: Vector3, color: Color) -> void:
 		crack.rotation_degrees.y = angle
 		Vis.make_private(crack, "julia")
 		add_child(crack)
+
+
+# --- Book 3: breakfast -------------------------------------------------------------
+
+## Book 3 steps 1-2 (canon: the reunion breakfast, comparing stories; Jason can
+## no longer read Egyptian, HIGH). From here on both twins see every entry.
+func _breakfast() -> void:
+	GameState.set_flag("b3.started")
+	GameState.share_journal()
+	GameState.add_journal("breakfast", "Breakfast at Villa Argo",
+		"Nestor's breakfast, and we tell each other everything: the storm, Manfred and the Owl key, Punt, Maruk, the map-seller, the room that isn't there, and Oblivia Newton walking off with the map. From now on we keep one journal between us.")
+	GameState.add_journal("lost_in_translation", "Lost in translation",
+		"Jason looks at the Egyptian signs he copied from the drawing of the Metis. In Punt he could understand every word anyone said. Now the signs are just little pictures. Nobody can explain it.")
+	GameState.add_journal("map_memory", "What I remember of the map",
+		"I only held the map for about ten seconds, but I remember three little drawings on it:\n- right on the coast at the top of the map, something tall and thin with lines coming out of the top, like rays;\n- in the west of the village, a small sitting animal with pointed ears;\n- in the east, a big house with a lion's head drawn on its door.\nJulia should check them against something.", "jason")
+	Game.current.say("Book 3: The House of Mirrors. Over breakfast, the three of you compare everything. Rick: \"Something about Kilmore Cove doesn't add up.\"")
 
 
 # --- Book 2: the storm (Julia's half) ----------------------------------------------
