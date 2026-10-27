@@ -256,6 +256,7 @@ func _sail(_player: Node3D) -> void:
 		"We chose Egypt. The Metis carried us out of the cave and into the mist.")
 	await get_tree().create_timer(4.0).timeout
 	GameState.set_flag("b2.started")
+	GameState.set_flag("b2.away")
 	Game.current.change_level(PUNT)
 	Game.current.say("Book 2: The Long-Lost Map. The mist clears over a hot, bright harbour: the Land of Punt.")
 

@@ -132,9 +132,21 @@ func show_prompt(text: String) -> void:
 	_prompt.visible = text != ""
 
 
+## Shows `text` on this peer's screen only.
+func show_message(text: String) -> void:
+	_show_local_toast(text)
+
+
 ## Host: show `text` to both twins, or only to `who` ("jason" / "julia").
 func say(text: String, who := "both") -> void:
 	_toast_rpc.rpc(text, who)
+
+
+## Host: like say(), after `seconds`. Use this instead of awaiting in a level
+## when the twins may have left that level (and it was unloaded) by then.
+func say_later(text: String, seconds: float, who := "both") -> void:
+	await get_tree().create_timer(seconds).timeout
+	say(text, who)
 
 
 ## Opens a text box on this peer's screen; `callback` gets the text on submit.

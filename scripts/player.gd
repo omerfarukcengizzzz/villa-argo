@@ -137,6 +137,13 @@ func _physics_process(delta: float) -> void:
 		position = level.to_global(level.respawn_point(role, level.to_local(global_position)))
 		velocity = Vector3.ZERO
 		Game.current.announce_fall.rpc(role)
+	for hazard in get_tree().get_nodes_in_group("hazards"):
+		if hazard.contains(global_position):
+			var at: Level = hazard.get_parent()
+			position = at.to_global(hazard.respawn)
+			velocity = Vector3.ZERO
+			Game.current.show_message(hazard.message)
+			break
 
 	_update_focus(active)
 

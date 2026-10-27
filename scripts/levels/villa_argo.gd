@@ -163,6 +163,7 @@ func _build_courtyard() -> void:
 		["storm.phase=chase", "After him! The brute's heading for the cliff!"],
 		["storm.phase=fallen", "Over the cliff? His sort always crawl out of the sea. Have you got the key back?"],
 		["b2.split & argo_door.open", "You opened it from this side... Then we wait for the boys."],
+		["b2.home", "Back, are you? All three of you, sunburnt in a storm. I won't ask."],
 	]
 	nestor.stations = [["", Vector3(4, 1, 17)], ["b2.split", Vector3(1.5, 1, 7)]]
 	nestor.on_used = _talk_nestor
@@ -220,7 +221,7 @@ func _build_house() -> void:
 	var rick := Npc.new()
 	rick.npc_name = "Rick"
 	rick.color = Color(0.85, 0.4, 0.2)
-	rick.present = "argo.rick_here & !b2.started"
+	rick.present = "argo.rick_here & !b2.away"
 	rick.lines = [
 		["argo.rick_here", "I'm Rick, Rick Banner. Everybody in Kilmore Cove talks about this house. They say Ulysses Moore used to go down the cliff path behind the garden."],
 		["item:parchment", "Those symbols... There's a huge old dictionary in your library. Julia, you're good at this sort of thing."],

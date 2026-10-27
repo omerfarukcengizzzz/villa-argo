@@ -5,8 +5,10 @@ extends Level
 ## wall that collapses, splitting the twins (Julia through the Door, Jason and
 ## Rick stuck here). Pass B, Jason's half (steps 4-9): Maruk under the beam,
 ## the House of Life and Ulysses's note, Oblivia in the market, the map shop,
-## the errands, and the legend with the Ballad. Pass C (the corridors under
-## the map shop) comes next. No date or pharaoh for Punt (ref §5).
+## the errands, and the legend with the Ballad. The corridors under the map
+## shop are the punt_corridors level (Pass C); with the map gone to Oblivia,
+## Jason comes home through the Door once Julia has opened it from the house
+## (step 18). No date or pharaoh for Punt (ref §5).
 ## Punt journal entries are Jason's alone: Julia only learns them if he tells her.
 ##
 ## Map (north = -z): harbour z -2..10 with the Metis moored to the south;
@@ -16,6 +18,7 @@ extends Level
 ## gap in the west houses, the market square (x -24..-7) with the map shop.
 
 const VILLA_ARGO := "res://scenes/levels/villa_argo.tscn"
+const CORRIDORS := "res://scenes/levels/punt_corridors.tscn"
 
 const STONE := Color(0.78, 0.68, 0.5)
 const SAND := Color(0.88, 0.78, 0.55)
@@ -31,6 +34,7 @@ func _init() -> void:
 func _build() -> void:
 	entries = {
 		"default": {"jason": Vector3(-1, 1, 8), "julia": Vector3(1, 1, 8)},
+		"map_shop": {"jason": Vector3(-20, 1, -23.5), "julia": Vector3(-19, 1, -23.5)},
 	}
 	fall_y = -10.0
 	add_environment(Color(0.75, 0.85, 0.95))
@@ -73,6 +77,16 @@ func _physics_process(_delta: float) -> void:
 func _collapse() -> void:
 	GameState.set_flag("punt.wall_fell")
 	Game.current.say("With a roar, the old wall collapses! Stones bounce down the street. Rick shouts: \"Back to the Door!\"")
+
+
+func _home(_player: Node3D) -> void:
+	for f in ["b2.split", "b2.away", "punt.disguised", "argo.night"]:
+		GameState.set_flag(f, false)
+	GameState.set_flag("b2.home")
+	Game.current.say("The Door swings open, and Jason and Rick tumble through into Villa Argo, sunburnt and dusty. Outside, the storm is over.")
+	GameState.add_journal("home_again", "Home again",
+		"We're all back at Villa Argo. Julia held the house against Manfred in the storm and opened the Door from this side. Jason and Rick found the map of Kilmore Cove in the room that isn't there, and lost it straight away to Oblivia Newton.\nShe has the map now. Whatever it shows, she knows it too.")
+	Game.current.say_later("End of book 2: The Long-Lost Map. (Book 3, The House of Mirrors, comes next.)", 4.0)
 
 
 func _split(_player: Node3D) -> void:
@@ -138,10 +152,22 @@ func _build_hall() -> void:
 	door.solo = true
 	door.level = VILLA_ARGO
 	door.entry = "door"
-	door.requires = "punt.wall_fell & !b2.split"
+	door.requires = "punt.wall_fell & !b2.split & !b2.home"
 	door.prompt = "Run through the Door!"
 	door.on_used = _split
 	place(door, "TheDoor", Vector3(-3, 1, -6))
+
+	# Step 18 (canon ✅): the boys come home through the Argo Door, once Julia
+	# has opened it from the house.
+	var home := LevelExit.new()
+	home.who = "jason"
+	home.solo = true
+	home.level = VILLA_ARGO
+	home.entry = "door"
+	home.requires = "b2.map_taken & argo_door.open & b2.split"
+	home.prompt = "Go home through the Door"
+	home.on_used = _home
+	place(home, "DoorHome", Vector3(-2.9, 1, -6.4))
 
 	# Guards turn away anyone not dressed like a local.
 	var line := Door.new()
@@ -231,6 +257,7 @@ func _build_house_of_life() -> void:
 		["punt.maruk_free", Vector3(11.5, 1, -21.5)],
 		["punt.guards_passed", Vector3(16.5, 1, -27.5)],
 		["journal:door_backwards", Vector3(-11, 1, -24.5)],
+		["b2.map_taken", Vector3(1.5, 1, -4)],
 	]
 	maruk.lines = [
 		["", "Help! My leg... the beam!"],
@@ -239,6 +266,7 @@ func _build_house_of_life() -> void:
 		["journal:door_backwards", "A room that isn't there? The old map-seller in the market knows every strange story in Punt. Come, I'll show you."],
 		["punt.errands_given", "Poor old man, his feet are so swollen he can barely walk. Errands are how he gets by."],
 		["punt.legend", "That ballad... my mother used to sing it. Nobody knows what it means."],
+		["b2.map_taken", "You're going home? Then go well, Jason, and you too, Rick. Punt will remember you."],
 	]
 	place(maruk, "Maruk", Vector3(9.5, 1, -27.2))
 
@@ -366,6 +394,13 @@ func _build_market() -> void:
 	add_box(Vector3(3, 1, 0.8), Vector3(-17.5, 0.5, -22.5), Color(0.45, 0.32, 0.2))
 	add_box(Vector3(1.2, 2, 0.1), Vector3(-21, 1, -20.6), Color(0.15, 0.12, 0.1))
 	add_label("steps down into the dark", Vector3(-21, 2.3, -20.8), 0).font_size = 24
+	var steps := LevelExit.new()
+	steps.who = "jason"
+	steps.solo = true
+	steps.level = CORRIDORS
+	steps.requires = "punt.legend"
+	steps.prompt = "Go down the steps"
+	place(steps, "StepsDown", Vector3(-21, 1, -21.3))
 
 	var seller := Npc.new()
 	seller.npc_name = "The map-seller"
@@ -430,6 +465,7 @@ func _build_rick() -> void:
 		["punt.guards_passed", Vector3(17.5, 1, -23.5)],
 		["journal:door_backwards", Vector3(-11, 1, -26.5)],
 		["punt.legend", Vector3(-19.5, 1, -24.5)],
+		["b2.map_taken", Vector3(-1.5, 1, -4)],
 	]
 	rick.lines = [
 		["", "The Metis brought us to Egypt. Real Egypt! We can't walk about dressed like this, though. There's a chest of clothes on the quay."],
@@ -442,5 +478,7 @@ func _build_rick() -> void:
 		["journal:door_backwards", "The room that isn't there... Maruk says the map-seller in the market might know. And tell Julia about the Door: ask it backwards!"],
 		["punt.errands_given", "Errands! Fine: the sailor's down on the quay, and the doctor's in the market square."],
 		["punt.legend", "The Ballad of Two Lovers... Julia's got all Ulysses's books at home. Ask her if he wrote anything about it!"],
+		["b2.map_taken", "She just took it! Well... we know where it is, at least. Let's go home, back to the Door."],
+		["b2.map_taken & !argo_door.open", "The Door's still shut. Julia has to open it from her side. Did you tell her: ask it backwards?"],
 	]
 	place(rick, "Rick", Vector3(2, 1, 6.5))
