@@ -16,6 +16,7 @@ extends Level
 const VILLA_ARGO := "res://scenes/levels/villa_argo.tscn"
 const MIRROR_HOUSE := "res://scenes/levels/mirror_house.tscn"
 const SCHOOL := "res://scenes/levels/school.tscn"
+const STATION := "res://scenes/levels/station.tscn"
 ## Book 5 step 4: Dad's walk across the square, one stop every DAD_SECONDS.
 const DAD_ROUTE := [Vector3(-12, 1, 3), Vector3(-22, 1, 3), Vector3(-32, 1, 0), Vector3(-32, 1, -14), Vector3(-22, 1, -15)]
 const DAD_SECONDS := 4.0
@@ -43,6 +44,7 @@ func _build() -> void:
 		"default": {"jason": Vector3(-1.2, 1, 8), "julia": Vector3(1.2, 1, 8), "yaw": 0.0},
 		"mirror_house": {"jason": Vector3(32, 1, -13.5), "julia": Vector3(34, 1, -13.5), "yaw": PI},
 		"school": {"jason": Vector3(-24, 1, 11.5), "julia": Vector3(-22, 1, 11.5), "yaw": PI},
+		"station": {"jason": Vector3(21, 1, 3), "julia": Vector3(23, 1, 3), "yaw": 0.0},
 	}
 	add_environment(Color(0.6, 0.72, 0.85))
 
@@ -376,6 +378,7 @@ func _build_railway() -> void:
 	add_label("tunnel (boarded up)", Vector3(52.6, 4, 0), -90)
 	add_box(Vector3(6, 4, 4), Vector3(22, 2, 7), Color(0.6, 0.55, 0.5))
 	add_label("STATION (CLOSED)", Vector3(22, 4.4, 4.8), 0)
+	_build_town_hall()
 	var tunnel := JournalNote.new()
 	tunnel.who = "jason"
 	tunnel.requires = "b3.started"
@@ -386,6 +389,38 @@ func _build_railway() -> void:
 	tunnel.size = Vector3(0.01, 0.01, 0.01)
 	tunnel.on_used = func(_p: Node3D) -> void: _found("b3.tracks")
 	place(tunnel, "Tunnel", Vector3(51.8, 1, 0))
+
+
+## Book 5 step 6 (canon, HIGH): sleepy Fred Dormiveglia, the town hall clerk
+## with all the keys, opens the chained station.
+func _build_town_hall() -> void:
+	add_box(Vector3(6, 5, 5), Vector3(16, 2.5, -10.5), Color(0.8, 0.78, 0.7))
+	add_label("TOWN HALL", Vector3(16, 4.4, -7.9), 0)
+	add_box(Vector3(2, 3, 0.2), Vector3(22, 1.5, 4.9), Color(0.3, 0.3, 0.3))
+	add_label("chains and a padlock", Vector3(22, 3.3, 4.7), 0).font_size = 22
+	var fred := Npc.new()
+	fred.npc_name = "Fred Dormiveglia"
+	fred.color = Color(0.55, 0.5, 0.4)
+	fred.walk_speed = 1.5
+	fred.stations = [["", Vector3(16, 1, -6.8)], ["b5.station_open", Vector3(20, 1, 4)]]
+	fred.lines = [
+		["", "*yaaawn* Town hall's closed for lunch. Or... is it open? Come back later."],
+		["b5.recovered", "Clark Beamish Station? Nobody's asked for that in years. Yes, yes, I've got the keys. I've got all the keys. Come along, then... slowly."],
+		["b5.station_open", "There you are, all open. Mind the birds. I'll be inside, resting my eyes."],
+	]
+	fred.on_used = func(_p: Node3D) -> void:
+		if GameState.get_flag("b5.recovered", false) and not GameState.get_flag("b5.station_open", false):
+			GameState.set_flag("b5.station_open")
+			GameState.add_journal("fred", "Fred Dormiveglia",
+				"Fred from the town hall is the sleepiest man in Kilmore Cove, and he carries a ring of about a hundred keys. Ordinary keys: he found the right one for the station's padlock on only the eleventh try. The chains are off. Clark Beamish Station is open.")
+			Game.current.say_later("Fred yawns his way down to the station, tries eleven keys, and the chains fall off the door. \"There you are.\"", 1.5)
+	place(fred, "Fred", Vector3(16, 1, -6.8))
+
+	var door := LevelExit.new()
+	door.level = STATION
+	door.requires = "b5.station_open"
+	door.prompt = "Go into the station"
+	place(door, "StationDoor", Vector3(22, 1, 3.8))
 
 
 func _build_mirror_house() -> void:
@@ -458,6 +493,7 @@ func _build_rick() -> void:
 		["item:tourist_guide", Vector3(-17.5, 1, -2.5)],
 		["b3.dedalus", Vector3(31, 1, -14)],
 		["b3.escaped", Vector3(30, 1, -12)],
+		["b5.recovered", Vector3(14, 1, -5.5)],
 	]
 	rick.lines = [
 		["b3.started", "Let's make a list of everything that's strange about this place. I've lived here all my life and I never noticed. The bookshop has atlases, there's the phone box, the old railway, and that statue in the square..."],
@@ -466,5 +502,8 @@ func _build_rick() -> void:
 		["journal:three_marks", "The lighthouse, the cat house and the House of Mirrors. Let's ask the people who live there."],
 		["b3.dedalus", "The House of Mirrors, then. Come on: the door's not even locked."],
 		["b3.escaped", "Venice. If Oblivia's gone after Dedalus, we'll have to go too. The Metis took us to Egypt... maybe it can take us there."],
+		["b5.recovered", "Fred's at the town hall. He's got the keys to everything in Kilmore Cove... if you can keep him awake long enough."],
+		["b5.station_open", "The station! I've never been inside. Nobody has, not for years."],
+		["b5.train_awake", "Back to Argo. Nestor needs to hear about this."],
 	]
 	place(rick, "Rick", Vector3(2.5, 1, 6))
