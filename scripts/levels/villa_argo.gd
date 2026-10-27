@@ -502,7 +502,9 @@ func _run_storm(delta: float) -> void:
 	_storm_t += delta
 	match str(GameState.get_flag("storm.phase", "")):
 		"":
-			if GameState.has_journal("ballad_notes") and GameState.has_journal("sound_key_notes"):
+			# Pacing: the storm waits for Jason to reach the map shop in Punt.
+			if GameState.has_journal("ballad_notes") and GameState.has_journal("sound_key_notes") \
+					and GameState.get_flag("punt.map_shop", false):
 				_storm_t = 0.0
 				GameState.set_flag("storm.phase", "arriving")
 				Game.current.say("Through the rain, headlights sweep across the garden. A huge man climbs out of a car and starts circling the house.", "julia")

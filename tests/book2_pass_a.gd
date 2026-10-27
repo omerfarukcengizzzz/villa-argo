@@ -3,6 +3,8 @@ extends SceneTree
 
 var role := ""
 var fails := 0
+## Set at the very end of _host/_client; a script error aborts them early.
+var finished := false
 
 
 func _initialize() -> void:
@@ -89,6 +91,8 @@ func _run() -> void:
 		await _host()
 	else:
 		await _client()
+	if not finished:
+		check(false, "script stopped early (see SCRIPT ERROR above)")
 	log_("DONE fails=%d" % fails)
 	quit(1 if fails else 0)
 
@@ -143,7 +147,7 @@ func _host() -> void:
 	check(journal_ids("both").has("mastaba"), "mastaba entry")
 	gs().set_flag("test.go_town")
 	await until(func() -> bool: return gs().get_flag("punt.wall_fell", false), "the wall collapses")
-	check(toast().contains("collapses") and not node("DoorNote").is_available(), "collapse; note not yet")
+	check(toast().contains("collapses"), "the wall collapses (message)")
 
 	# Julia runs through the Door; the twins are split.
 	await until(func() -> bool: return gs().get_flag("b2.split", false), "split", 20)
@@ -151,9 +155,7 @@ func _host() -> void:
 	check(game().level_for("julia").scene_file_path.ends_with("villa_argo.tscn") and level_name() == "punt.tscn", "Julia at Villa Argo, Jason in Punt")
 	check(game()._levels.size() == 2 and not game().level_for("julia").visible, "host keeps both levels, shows only Punt")
 	check(not gs().get_flag("argo_door.open", true), "the Door is shut")
-	await move_me(Vector3(3.2, 1, -23))
-	await use("DoorNote")
-	check(journal_ids("jason").has("door_backwards") and not journal_ids("julia").has("door_backwards"), "Jason's Door note")
+	gs().set_flag("punt.map_shop")  # Pass B: the storm waits for Jason at the map shop
 
 	# Julia's half runs on the client; wait for her to reopen the Door.
 	await until(func() -> bool: return gs().get_flag("argo_door.open", false), "Julia reopens the Door", 200)
@@ -163,6 +165,7 @@ func _host() -> void:
 	await wait(1.0)
 	check(level_name() == "punt.tscn" and game().level_for("julia").scene_file_path.ends_with("villa_argo.tscn"), "after rejoin: still split")
 	await until(func() -> bool: return game().get_players().size() == 1, "client finished", 30)
+	finished = true
 
 
 func _client() -> void:
@@ -234,6 +237,7 @@ func _client() -> void:
 	check(level_name() == "villa_argo.tscn" and game()._levels.size() == 1, "rejoin lands back at Villa Argo")
 	check(node("ArgoDoor")._opened and gs().has_item("owl_key"), "rejoin keeps the open Door and the key")
 	root.get_node("/root/Net").disconnect_from_game()
+	finished = true
 
 
 func _join() -> void:

@@ -3,6 +3,8 @@ extends SceneTree
 
 var role := ""
 var fails := 0
+## Set at the very end of _host/_client; a script error aborts them early.
+var finished := false
 
 
 func _initialize() -> void:
@@ -88,6 +90,8 @@ func _run() -> void:
 		await _host()
 	else:
 		await _client()
+	if not finished:
+		check(false, "script stopped early (see SCRIPT ERROR above)")
 	log_("DONE fails=%d" % fails)
 	quit(1 if fails else 0)
 
@@ -172,6 +176,7 @@ func _host() -> void:
 	await wait(0.3)
 	check(gs().get_flag("metis.sailed", false) and toast().contains("Egypt"), "the Metis sails for Egypt")
 	await until(func() -> bool: return game().get_players().size() == 1, "client finished", 25)
+	finished = true
 
 
 func _client() -> void:
@@ -217,3 +222,4 @@ func _client() -> void:
 	await wait(0.3)
 	check(toast().contains("Egypt") and journal_ids("julia").has("book1_end"), "Julia sees the departure")
 	root.get_node("/root/Net").disconnect_from_game()
+	finished = true
