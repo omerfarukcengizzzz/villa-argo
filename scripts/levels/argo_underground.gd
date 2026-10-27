@@ -13,6 +13,7 @@ const VILLA_ARGO := "res://scenes/levels/villa_argo.tscn"
 const SELF := "res://scenes/levels/argo_underground.tscn"
 const PUNT := "res://scenes/levels/punt.tscn"
 const VENICE := "res://scenes/levels/venice.tscn"
+const GARDEN := "res://scenes/levels/garden.tscn"
 const STAIR_TOPS := [0.0, -2.0, -4.0, -6.0]
 const STAIR_Z := [-10.75, -15.75, -20.75, -25.75]
 ## Floor stone targets (0 north, 1 east, 2 south, 3 west), stone 1 first.
@@ -266,6 +267,28 @@ func _build_cave() -> void:
 		Game.current.say("The helm shudders, the mist closes in... and opens on a lagoon full of bells: Venice.")
 	place(to_venice, "HelmVenice", Vector3(0, deck_y + 1.2, -52))
 
+	# Book 5 step 12: Oblivia's been aboard (adaptation: the page she dropped
+	# names where she went; canon: the Garden, through the Argo Door).
+	var page := JournalNote.new()
+	page.requires = "b5.oblivia_ahead"
+	page.entry_id = "perfumed_page"
+	page.title = "A perfumed page"
+	page.body = "The Metis's cabin smells of expensive perfume. On the floor, a page torn from a notebook, in a sharp, slanting hand:\n\"Vulcano: last seen at the station. The Horse Door leads to the Garden of Prester John. If he's anywhere, he's there.\"\nOblivia's handwriting. She's gone to the Garden."
+	page.prompt = "Pick up the page on the deck"
+	page.size = Vector3(0.3, 0.02, 0.4)
+	place(page, "PerfumedPage", Vector3(1.0, deck_y + 0.05, -56.5))
+	var to_garden := Helm.new()
+	to_garden.requires = "journal:perfumed_page & !b5.sailed"
+	to_garden.answer = "The Garden of Prester John"
+	to_garden.solved_flag = "b5.sailed"
+	to_garden.question = "Where should the Metis sail?"
+	to_garden.wrong_text = "The helm won't turn. The Metis seems to know where you need to go."
+	to_garden.options = [["Egypt", true], ["Venice", true], ["The Garden of Prester John", true]]
+	to_garden.on_used = func(_p: Node3D) -> void:
+		GameState.set_flag("b5.away")
+		Game.current.change_level(GARDEN)
+	place(to_garden, "HelmGarden", Vector3(0, deck_y + 1.2, -52))
+
 
 ## Book 4 step 17 (canon chapter "Ritorni a casa", HIGH): Julia and Rick come
 ## home on the Metis; once Jason is down on the beach too, the twins are back
@@ -307,6 +330,7 @@ func _build_rick() -> void:
 		["under.candle_out", Vector3(0.8, 1, -9.5)],
 		["under.niche3", Vector3(-4.5, -7, -31)],
 		["stones.solved", Vector3(-3, -15, -41)],
+		["b5.oblivia_ahead", Vector3(-3, -15, -44)],
 	]
 	rick.lines = [
 		["", "Four ways out, and we came in by one of them. There are letters all over the floor... Julia, can you make anything of them?"],
@@ -317,5 +341,6 @@ func _build_rick() -> void:
 		["stones.solved", "A ship! A real ship, down here!"],
 		["metis.log_read", "It says someone has to choose where to go. Jason, take the helm!"],
 		["metis.sailed", "Egypt! I can't believe it!"],
+		["b5.oblivia_ahead", "Somebody has to stay and keep watch, in case they come back this way. I'll stay with Nestor. Go on, both of you. And Julia... be careful."],
 	]
 	place(rick, "Rick", Vector3(3.5, 1, 3.5))

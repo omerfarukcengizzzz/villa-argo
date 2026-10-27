@@ -191,6 +191,7 @@ func _build_courtyard() -> void:
 		["b4.argo_safe", "Gone, the lot of them. Well done, boy. Hmph. Your sister had better be all right."],
 		["b4.home", "Black Vulcano? Hmph. Drove the trains, years ago, when there were trains. Now get some sleep: it's school tomorrow, and your parents have written to the headteacher."],
 		["b5.started", "School. Go. And don't bring anything home I'll have to explain."],
+		["b5.oblivia_ahead", "Through the Door, the pair of them. Hmph. Be careful where it takes you. And come back."],
 	]
 	nestor.stations = [["", Vector3(4, 1, 17)], ["b2.split", Vector3(1.5, 1, 7)], ["b4.split", Vector3(10, 1, -8.6)], ["b4.nestor_free", Vector3(8, 1, -2)]]
 	nestor.on_used = _talk_nestor
@@ -473,6 +474,20 @@ func _add_cracked_ledge(top: Vector3, color: Color) -> void:
 
 
 # --- Book 5: the new goal -----------------------------------------------------------
+
+func _host_setup() -> void:
+	if GameState.get_flag("b5.train_awake", false) and not GameState.get_flag("b5.oblivia_ahead", false):
+		_oblivia_ahead()
+
+
+## Book 5 step 12 (canon ✅: Oblivia and Manfred reach the Garden through the
+## Argo Door too). How they got in is adaptation.
+func _oblivia_ahead() -> void:
+	GameState.set_flag("b5.oblivia_ahead")
+	GameState.add_journal("oblivia_ahead", "Oblivia went first",
+		"Back at Villa Argo, Nestor was waiting at the gate, furious. While we were at the station, Oblivia Newton and Manfred walked into the house as if they owned it and went straight through the Door in the stone room. Nestor couldn't stop them.\nThey're ahead of us. Down to the Metis, quick.")
+	Game.current.say("Nestor is at the gate, grim. \"That woman. And her driver. Straight past me and through the Door, not an hour ago. Go, if you're going.\"")
+
 
 ## Book 5 step 1 (canon ✅): find Black Vulcano before Oblivia does.
 func _start_book5() -> void:
