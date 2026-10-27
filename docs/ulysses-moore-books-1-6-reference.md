@@ -69,7 +69,7 @@ All three reports agree on these, or a primary source confirms them.
 | **B2** is set in the **Land of Punt** (an ancient-Egyptian world). The party is split: **Julia ends up back at Villa Argo**, while **Jason and Rick** stay in Punt with a local girl, **Maruk**, searching for a map hidden in **"the room that isn't there."** **Oblivia Newton** takes the map. | HIGH [H][Gk][Gm] |
 | **B3** is mainly an investigation in Kilmore Cove: the village is missing from maps, its railway leads nowhere, and the inventor **Peter Dedalus's House of Mirrors** holds clues. Oblivia goes through a Door to **18th-century Venice** at the end. | HIGH [H][Gk][Gm] |
 | **B4** takes place in **18th-century Venice**: masks, the **Black Gondolier**, and the search for Dedalus on the **Isle of Masks**. | HIGH ✅ (publisher blurb) [H][Gk][Gm] |
-| **B5:** the search for **Black Vulcano**, the old railwayman, leads through the abandoned station to the medieval **Garden of Prester John / Garden of Eternal Youth**. | HIGH [H][Gk][Gm] |
+| **B5:** the search for **Black Vulcano**, the old railwayman, leads to the abandoned station and on to the medieval **Garden of Prester John / Garden of Eternal Youth**. The twins (with Oblivia and Manfred) get there **through the Villa Argo Door**; the station Door is used in **B6** (see "Second source check"). | HIGH (destination) / MEDIUM ✅ (route) [H][Gk][Gm] |
 | **B6:** Jason and Julia are trapped in the medieval Garden with Oblivia and Manfred, while **Rick starts out in Kilmore Cove**. Later he goes to the Garden through the station Door with Ulysses (Polish travel table ✅; the agency blurb puts all three in the medieval town). | HIGH [H][Gm] / MEDIUM (Rick's trip) |
 | **Nestor, the gardener, is Ulysses Moore.** Revealed in **B6**: **Rick finds out by breaking into Nestor's house.** | HIGH ✅ (Piemme synopsis: *"Rick l'ha scoperto facendo irruzione nella casa di Nestor"*) [H][Gm] |
 | The **First Key** (*Prima Chiave*) opens any Door, and is marked with **three turtles**. | HIGH (function) / MEDIUM (turtles) [H][Gk][Gm] |
@@ -137,7 +137,7 @@ All three reports agree on these, or a primary source confirms them.
 | **Nestor** | Elderly, limping, gruff gardener and caretaker; lives in a cottage on the grounds. Tells the family the door may lead to an old cistern and that its keys are lost (**this is a lie**). Helps Julia in B2. HIGH [H][Gk][Gm] | **SPOILER (B6): Nestor IS Ulysses Moore.** HIGH ✅. Why he disguised himself: Gemini says to escape people hunting the Doors and to find worthy successors; English Wikipedia says the villagers kept bothering him. Treat the details as LOW. |
 | **Ulysses Moore** | Former owner of Villa Argo. Wrote the coded diaries and set up the puzzles. A member of the 1958 group. Believed absent or dead. HIGH [H] | Same man as Nestor. His diary handwriting matches the Metis log (B1). MEDIUM [H] |
 | **Penelope Moore** (born **Sauri**) | Ulysses's wife, believed dead or lost in B1–6. Close to Dedalus. Nestor talks to Julia about her in B2. MEDIUM [H][Gk][Gm] | **SPOILER (B4): she came from 18th-century Venice**, and Ulysses brought her to Kilmore Cove. Rick and Julia visit her old Venetian home in B4. MEDIUM [Gk][Gm]. Maiden name **Sauri** (Spanish Wikipedia) MEDIUM [Gk][Gm]. ✖ "Dell'Acqua family" is retracted. **LATER SERIES:** her kidnapping by Captain Spencer and her fate (books 7–12). |
-| **Oblivia Newton** | Rich, ruthless villain (B2–B6). Hunts the map, then the First Key. In Punt she reportedly trades cheap modern **lighters** for local gold. HIGH [H][Gk][Gm] | **Parents:** **Black Vulcano** (father) and **Clio Biggles** (mother), according to French and Spanish Wikipedia. MEDIUM [Gk][Gm][H for mother]. *Which book reveals this is UNKNOWN* (a B6 chapter called "Fathers and Daughters" hints at B6; LOW). **Former lover of Peter Dedalus**, through whom she learned about the Doors (Italian Wikipedia, in the B4 summary). MEDIUM [Gm][H]. **End of B6:** she returns from the Garden (LOW [Gm]). ✖ "Trapped in Thule" is retracted. |
+| **Oblivia Newton** | Rich, ruthless villain (B2–B6). Hunts the map, then the First Key. In Punt she reportedly trades cheap modern **lighters** for local gold. HIGH [H][Gk][Gm] | **Parents:** **Black Vulcano** (father) and **Clio Biggles** (mother), according to French and Spanish Wikipedia. MEDIUM [Gk][Gm][H for mother]. **Revealed by B6 at the latest** ✅ (French Wikipedia's B6 summary; the reported B6 chapter "Fathers and Daughters" fits). Whether an earlier book hints at it is UNKNOWN. **Former lover of Peter Dedalus**, through whom she learned about the Doors (Italian Wikipedia, in the B4 summary). MEDIUM [Gm][H]. **End of B6:** she returns from the Garden (LOW [Gm]). ✖ "Trapped in Thule" is retracted. |
 | **Manfred** | Oblivia's hulking, unlucky driver and henchman (B2–B6). Tries to break into Argo, steals a key, fights Nestor and Julia, keeps falling off the cliff and surviving. Goes to the medieval Garden in B6. HIGH [H][Gk][Gm] | **End of B6:** leaves Oblivia and **runs off with the hairdresser Gwendaline Mainoff to Punt** through the Cat Door. LOW–MEDIUM [Gm, from Spanish and Polish Wikipedia]. ✖ "Trapped in Thule" is retracted. |
 
 ### Kilmore Cove residents and the old group
@@ -150,7 +150,7 @@ All three reports agree on these, or a primary source confirms them.
 | **Calypso** | Runs the bookshop/library; helps the children; 1958 group member (Polish wiki). MEDIUM [H][Gk][Gm] | Return of Minaxo's love by B6: LOW–MEDIUM. Her **Whale Door → Atlantis** is **LATER SERIES** (first used in B9). |
 | **Clitennestra "Clio" Biggles** | 1958 group member. MEDIUM [H][Gm] | **Oblivia's mother.** MEDIUM. The B5 chapter "Following Clio" may refer to **her or to the train named CLIO** (see §5, B5). UNKNOWN |
 | **Miss Cleopatra Biggles** | Elderly woman with many cats; **her house holds the Cat Door to Punt**. Oblivia uses it in B2. MEDIUM [H][Gk][Gm, from Polish Wikipedia] | Clio's sister. **Not** a 1958 group member (Gemini retracted). |
-| **Fred Dormiveglia** (Italian; Spanish *Duermevela*, Polish *Śpiczuwa*) | Sleepy, slow municipal clerk/archivist who carries many keys. **B5:** opens Clark Beamish Station and **turns its valves twice a week (red closed, blue open)**, paid in advance by Black Vulcano, without knowing why. Helps Rick with printed samples (B4). HIGH [H, P4–P5][Gk calls him "Fred (archive)"] | **Possibly holds the First Key:** Rick's mother Patricia wore it at her husband's funeral and later gave it to a charity raffle, which Fred won. LOW [Gm, from Polish fan wiki + Spanish Wikipedia; Gemini admits it stitched this together]. Whether this is revealed in B6 or later is UNKNOWN. Gemini's name "Fred Drummond" / "Sonnecchia" conflicts with the Italian primary text, which says **Dormiveglia**. |
+| **Fred Dormiveglia** (Italian; Spanish *Duermevela*, Polish *Śpiczuwa*) | Sleepy, slow municipal clerk/archivist who carries many keys. **B5:** opens Clark Beamish Station and **turns its valves twice a week (red closed, blue open)**, paid in advance by Black Vulcano, without knowing why. Helps Rick with printed samples (B4). HIGH [H, P4–P5][Gk calls him "Fred (archive)"] | **Has the First Key at the end of B6:** MEDIUM ✅ (Spanish Wikipedia: *"Al final del libro 6 se dice que tiene la primera llave"*). **How he got it** (Rick's mother Patricia wore it at her husband's funeral and later gave it to a charity raffle, which Fred won) is still LOW [Gm, from Polish fan wiki + Spanish Wikipedia; Gemini admits it stitched this together]. Gemini's name "Fred Drummond" / "Sonnecchia" conflicts with the Italian primary text, which says **Dormiveglia**. |
 | **Father Phoenix** (Phoenix Smith) | Parish priest; 1958 group member (Polish wiki). LOW–MEDIUM [H][Gk][Gm] | What he actually does in B1–6 is UNKNOWN. |
 | **Gwendaline Mainoff** | Village hairdresser. LOW [H][Gk] | Runs off with Manfred to Punt at the end of B6 and opens a beauty salon there. LOW–MEDIUM [Gm] |
 | **Dr Bowen and his wife** (Roger and Edna?) | Village doctor. LOW [H][Gk][Gm] | Background characters. |
@@ -261,7 +261,7 @@ All three reports agree on these, or a primary source confirms them.
 | **1958 group photo (half burned)** | B5–B6 | Probably damaged in the Isle of Masks fire; confiscated from Jason at school in B5. B6's synopsis says the answer to Ulysses's identity *"seems hidden in an old photograph"*. | MEDIUM ✅ (publisher teaser) |
 | **Things confiscated in B5** | B5 | **Four old keys, the half-burned photo, an Egyptian lucky charm**, pens, rubber bands and coins. | MEDIUM [H, R7] |
 | **Station timetable, ticket printer, levers, valves** | B5 | See §5. What they're for is UNKNOWN. | HIGH (they exist) |
-| **The CLIO 1974 locomotive** | B5 | Black Vulcano's train, which goes through the Horse Door (French Wikipedia: *"La clef du cheval ; le train CLIO 1974 ; le jardin du prêtre Jean"*). | LOW–MEDIUM [Gm] |
+| **The CLIO 1974 locomotive** | B5–B6? (UNKNOWN) | Black Vulcano's train, linked to the Horse Door (French Wikipedia's key table only: *"La clef du cheval ; le train CLIO 1974 ; le jardin du prêtre Jean"*). Which book uses it is UNKNOWN; the station Door is used in B6. | LOW [Gm] |
 | **"Voronoff combination", "Coquebrune key"** | B5 | Names from a review. Meaning UNKNOWN. | MEDIUM (names only) [H] |
 | **Gordian knot** | B6 | A reference to Alexander the Great. How it's used is UNKNOWN. | MEDIUM [H] |
 
@@ -360,7 +360,7 @@ Scenes are numbered for sequencing, **not** chapter numbers. Each line gives: pl
 3. **The 1958 photo** is part of the reveal (*"the answer seems hidden in an old photograph"*). Exactly how it's used (matching faces? the missing half?) is UNKNOWN. HIGH (it matters) ✅
 4. **Rick learns about his father,** who died searching for the First Key with Minaxo. MEDIUM ✅
 5. **The medieval maze.** The twins solve route problems and survive dangers in stone corridors. Characters: Prester John, and possibly Dagobert, Rigobert, Black Balthazar and Zan-Zan (LOW). HIGH (setting)
-6. **The truth about the First Key.** **Black Vulcano never had it; nobody from 1958 ever found it.** MEDIUM. It may have passed from **Rick's father → Patricia Banner → a charity raffle → Fred** (LOW).
+6. **The truth about the First Key.** **Black Vulcano never had it; nobody from 1958 ever found it.** MEDIUM. At the end of B6, **Fred is said to have it** (MEDIUM ✅). The route **Rick's father → Patricia Banner → a charity raffle → Fred** is LOW.
 7. **The Gordian knot.** It appears; how is UNKNOWN. MEDIUM
 8. **"Fathers and Daughters."** A reported chapter title (Polish wiki) suggesting the Black Vulcano/Oblivia relationship comes out here. LOW
 9. **Ending.** Manfred leaves Oblivia and runs off to Punt with Gwendaline (LOW–MEDIUM); Oblivia comes back from the Garden (LOW); **Julia and Rick start dating** (MEDIUM); Minaxo and Calypso get together (LOW–MEDIUM); the frame story ends with a telegram from "Baccalario" sent from Kilmore Cove (LOW [Gm]). The exact final scene is UNKNOWN.
@@ -430,7 +430,7 @@ Scenes are numbered for sequencing, **not** chapter numbers. Each line gives: pl
 | 55 | B5 | **Red and blue valves** | Fred (red closed, blue open) | Routine yes, purpose no | HIGH |
 | 56 | B5 | **"Half of sand and half of wind"** riddle | Trio | Partly | LOW–MEDIUM |
 | 57 | B5 | Tunnels, gears, the trap, "Following Clio" | ? | No | Titles HIGH |
-| 58 | B5 | Starting the CLIO locomotive; Horse Door | Trio | No | LOW–MEDIUM |
+| 58 | B5–B6? | Starting the CLIO locomotive; Horse Door (the station Door is used in B6 by Ulysses, Rick, Zan-Zan and Phoenix Smith) | ? | No | LOW |
 | 59 | B5 | Stone guardians; corridor of death | ? | No | Titles HIGH |
 | 60 | B5 | Voronoff combination; Coquebrune key | ? | No | Names MEDIUM |
 | 61 | B6 | **Breaking into Nestor's house → Nestor = Ulysses** | **Rick** | Yes (what he saw is unknown) | HIGH ✅ |
@@ -438,7 +438,7 @@ Scenes are numbered for sequencing, **not** chapter numbers. Each line gives: pl
 | 63 | B6 | Medieval maze | Jason and Julia | No | HIGH |
 | 64 | B6 | Black Vulcano's claim is false | ? | How it's proved: no | MEDIUM |
 | 65 | B6 | Gordian knot | ? | No | MEDIUM |
-| 66 | B6 | Where the First Key is (Fred via the raffle?) | ? | No | LOW |
+| 66 | B6 | Where the First Key is (Fred, MEDIUM ✅; via the raffle?, LOW) | ? | No | MEDIUM / LOW |
 
 ### What to reproduce faithfully, and what to invent
 - **Can be close to the books:** the receipt under the ship model, the four-lock door and the **APRI/OPEN** acrostic, the floor inscription, the rotating floor stones, the glowing clay, the handwriting match, Julia defending Argo, the **"d" typeface match**, the hidden print room, the 1936 timetable, the ticket printer, the **red/blue valve routine**, Rick's break-in.
@@ -462,7 +462,7 @@ Scenes are numbered for sequencing, **not** chapter numbers. Each line gives: pl
 | **End of B4** | "Black Vulcano has the First Key" (**a false lead**). | That it's false; Nestor. |
 | **B5** | Fred, the station, the timetable, the valves; the 1958 group; the Garden is reachable. | That the lead is false; Nestor. |
 | **B6: Rick's discovery** | **NESTOR IS ULYSSES MOORE.** | — |
-| **B6: the truth** | **Black Vulcano never had the First Key.** Rick's father's death. Black Vulcano is Oblivia's father (if confirmed). | Later-series material. |
+| **B6: the truth** | **Black Vulcano never had the First Key.** Rick's father's death. Black Vulcano is Oblivia's father ✅. | Later-series material. |
 | **End of B6** | The identity mystery is solved; protecting the Doors goes on. | Penelope's fate, later Doors and later characters (books 7+). |
 
 ### Mistakes to avoid
@@ -488,7 +488,7 @@ Scenes are numbered for sequencing, **not** chapter numbers. Each line gives: pl
 | The Metis needs "a tribute of stories or memories" | Gm-orig | ✖ Not found |
 | The map-shop owner is called **Bes** and is a villain | Gm-orig | ✖ Retracted (unnamed owner, crocodile Talos) |
 | Julia goes back alone to fetch the notebook; Oblivia breaks into Argo | Gm-orig | ✖ Wrong (the Door closes on her; Oblivia is in Punt) |
-| The boys come back through the Cat Door into Miss Biggles's house | Gm-orig | Downgraded (probably through the Argo Door) |
+| The boys come back through the Cat Door into Miss Biggles's house | Gm-orig | ✖ Contradicted: they return through the Argo Door ✅ (Polish travel table) |
 | Cleopatra Biggles is a 1958 group member; Clitennestra owns the cat house | Gm-orig | ✖ Swapped (Cleopatra owns the cat house; Clio is the member) |
 | The urchins are named **Steno and Zanni** | Gm-orig | ✖ Retracted (Don Diego Valente and Dieguita) |
 | Penelope is from the **Dell'Acqua** family | Gm-orig | ✖ Retracted (Sauri) |
@@ -530,13 +530,13 @@ In order of importance for the game:
 - **IBS listing, B4** ✅ checked: [ibs.it](https://www.ibs.it/isola-delle-maschere-libro-ulysses-moore/e/9788856697315)
 
 ### Encyclopedias (they cover all 19 books, so watch for later-book details)
-- **Italian Wikipedia** ([link](https://it.wikipedia.org/wiki/Ulysses_Moore_(serie_di_romanzi))): key list; Dedalus as Oblivia's *"vecchio amante"*. Not checked by Claude.
+- **Italian Wikipedia** ([link](https://it.wikipedia.org/wiki/Ulysses_Moore_(serie_di_romanzi))): key list; Dedalus as Oblivia's *"vecchio amante"*. ✅ Checked (second pass).
 - **English Wikipedia** ([link](https://en.wikipedia.org/wiki/Ulysses_Moore)): ✅ Nestor = Ulysses; Rick's father; only four books in English. Gemini quotes it saying Julia dates Rick in B6.
-- **French Wikipedia** ([link](https://fr.wikipedia.org/wiki/Ulysse_Moore)): Oblivia is the daughter of Black Vulcano and Clio; the CLIO 1974 train. Not checked.
-- **Spanish Wikipedia** ([link](https://es.wikipedia.org/wiki/Ulysses_Moore)): Penelope Sauri; Gwendaline and Manfred; Fred and the First Key. Not checked; Hornet says the page has errors.
-- **Polish Wikipedia** ([link](https://pl.wikipedia.org/wiki/Ulysses_Moore)): table of every Door trip by book (key evidence for what's LATER SERIES); the Venetian intruders' names. Not checked.
-- **Hungarian Wikipedia** ([link](https://hu.wikipedia.org/wiki/Ulysses_Moore)): the full B5 riddle in Hungarian. Not checked.
-- **Polish fan wiki**: [1958 "Great Summer" members](https://ulyssesmoore.fandom.com/pl/wiki/Wielkie_Wakacje) · [the First Key](https://ulyssesmoore.fandom.com/pl/wiki/Pierwszy_klucz). Not checked.
+- **French Wikipedia** ([link](https://fr.wikipedia.org/wiki/Ulysse_Moore)): Oblivia is the daughter of Black Vulcano (B6 summary); the CLIO 1974 train (key table only). ✅ Checked (second pass).
+- **Spanish Wikipedia** ([link](https://es.wikipedia.org/wiki/Ulysses_Moore)): Penelope Sauri; Gwendaline and Manfred; Fred and the First Key. ✅ Checked (second pass); Hornet says the page has errors.
+- **Polish Wikipedia** ([link](https://pl.wikipedia.org/wiki/Ulysses_Moore)): table of every Door trip by book (key evidence for what's LATER SERIES); the Venetian intruders' names. ✅ Checked (second pass).
+- **Hungarian Wikipedia** ([link](https://hu.wikipedia.org/wiki/Ulysses_Moore)): the full B5 riddle in Hungarian. ✅ Checked (second pass).
+- **Polish fan wiki**: [1958 "Great Summer" members](https://ulyssesmoore.fandom.com/pl/wiki/Wielkie_Wakacje) · [the First Key](https://ulyssesmoore.fandom.com/pl/wiki/Pierwszy_klucz). Not checked (the site returned an error).
 - **Russian Wikipedia**: contradicts the Italian key animals. Hornet rejected it.
 
 ### Reviews and retellings
