@@ -2,9 +2,34 @@
 
 **Purpose:** reference for a small, private 3D co-op adventure game based on the first six books (the "first cycle").
 **Built from:** three independent AI research reports (**Hornet**, **Grok**, **Gemini**), Gemini's own source check of its claims (22 questions), and a limited check of key quotes by Claude. Hornet's report is the base because it was the most careful about evidence.
-**Merged:** 27 October 2026
+**Merged:** 27 October 2026. **Second source check:** later the same day, Claude opened the key wiki and review pages directly (see "Second source check" below).
 
 > **What this is not.** Nobody involved read the six novels. Everything here comes from publisher synopses, short original-text previews, encyclopedias, fan wikis, reviews and school book reports. Where those don't establish an answer, this document says **UNKNOWN** instead of filling the gap. Anything you invent for the game should be labeled **adaptation**, not **canon**.
+
+---
+
+## SECOND SOURCE CHECK
+
+The first merge couldn't open most source sites. In the second pass Claude opened them and read the quoted text. Items confirmed this way are marked **✅** in the sections below.
+
+| Claim | Result | Source text |
+|---|---|---|
+| The boys come home from Punt through the **Villa Argo Door**, not the Cat Door | ✅ Confirmed | Polish Wikipedia's travel table: Jason, Julia, Rick go through *"wrota czasu w Willi Argo"* and all three return (B1–2). |
+| The Venetian intruders are **Don Diego Valente and Dieguita** | ✅ Names confirmed | Polish Wikipedia's travel table, B4. The dog **Diogo** is **not** on that page (LOW). |
+| **Manfred and Gwendaline** run off to Punt through the Cat Door at the end of B6 | ✅ Confirmed (two wikis) | Polish table, B6: *"Manfred, Gwendalina Mainoff"* via Miss Biggles's Door. Spanish Wikipedia: *"se fuga con Manfred a la Tierra de Punt"*. |
+| **Oblivia's parents are Black Vulcano and Clio Biggles** | ✅ Confirmed (two wikis); **revealed by B6** | French Wikipedia's **B6 summary**: *"Olivia Newton fille de Black Volcano"*. Spanish Wikipedia gives Clio as her mother. |
+| **Dedalus was Oblivia's former lover** | ✅ Confirmed | Italian Wikipedia's B4 summary: *"Peter Dedalus, il suo vecchio amante"*. |
+| **Black Vulcano never had the First Key** | ✅ Confirmed | Review R6: *"la Prima Chiave non solo non è affatto in possesso di Black Vulcano, ma non lo è mai stata"*. |
+| **Fred has the First Key at the end of B6** | ✅ Confirmed (one wiki) → MEDIUM | Spanish Wikipedia on Fred: *"Al final del libro 6 se dice que tiene la primera llave."* The **raffle** route through Patricia Banner is still LOW (Polish Wikipedia lists *"Patrycja Banner, John Bowen"* as owners; Spanish Wikipedia doesn't mention Patricia). |
+| **How the twins reach the Garden** | ⚠ **Corrects this doc** | Polish table, B5–6: **Jason, Julia, Oblivia and Manfred go through the Villa Argo Door**. The **station Door** is used in **B6** by **Ulysses, Rick, Zan-Zan and Phoenix Smith**, and Jason and Rick return with them. The author agency's B5 blurb only says the **"Train of Eternal Youth"** comes back to life at the abandoned station. |
+| **Rick in the Garden in B6** | ⚠ **Corrects this doc** | He starts B6 in Kilmore Cove, but then goes to the Garden with Ulysses (Polish table). The agency's B6 blurb: *"Lost in a labyrinthine medieval town, Jason, Julia, and Rick…"*. |
+| English keys **Owl, Porcupine, Elephant, Newt → OPEN** | ✅ Quote confirmed (one student blog) | *"elephant, newt, owl, and porcupine… O P E N"*. The same blog puts the post-office note in the **cliff box**, so the receipt's location is still disputed. |
+| The B5 riddle | ✅ Hungarian verse confirmed | Hungarian Wikipedia, B5 section: the verse comes just before the trip to the Garden. Italian fragments confirmed on the Indonesian blog. The full Italian text is still unknown. |
+| The map-shop owner | ✅ Quote confirmed | *"un vecchio signore dai piedi gonfi"*, *"un coccodrillo di nome Talos"*. The blog doesn't say whether he helps or betrays the boys. |
+| **Julia starts dating Rick in B6** | ✅ Confirmed | English Wikipedia: *"In the sixth book, Julia starts dating Rick Banner"*. |
+| Dedalus says Black Vulcano has the keys | ✅ Confirmed | Review R5: *"tutte le altre Chiavi, compresa la Prima, è in mano a Black Vulcano"*. The half-burned photo, the riddle and the CLIO train are **not** in that review. |
+| **CLIO 1974** train | Only in a key table | French Wikipedia's key table (*"La clef du cheval ; le train CLIO 1974"*), not a plot summary. Which book uses it is UNKNOWN. |
+| 1958 group members (Polish fan wiki) | Not checked | The site returned an error. Still LOW. |
 
 ---
 
@@ -45,7 +70,7 @@ All three reports agree on these, or a primary source confirms them.
 | **B3** is mainly an investigation in Kilmore Cove: the village is missing from maps, its railway leads nowhere, and the inventor **Peter Dedalus's House of Mirrors** holds clues. Oblivia goes through a Door to **18th-century Venice** at the end. | HIGH [H][Gk][Gm] |
 | **B4** takes place in **18th-century Venice**: masks, the **Black Gondolier**, and the search for Dedalus on the **Isle of Masks**. | HIGH ✅ (publisher blurb) [H][Gk][Gm] |
 | **B5:** the search for **Black Vulcano**, the old railwayman, leads through the abandoned station to the medieval **Garden of Prester John / Garden of Eternal Youth**. | HIGH [H][Gk][Gm] |
-| **B6:** Jason and Julia are trapped in the medieval Garden with Oblivia and Manfred, while **Rick stays in Kilmore Cove**. | HIGH [H][Gm] |
+| **B6:** Jason and Julia are trapped in the medieval Garden with Oblivia and Manfred, while **Rick starts out in Kilmore Cove**. Later he goes to the Garden through the station Door with Ulysses (Polish travel table ✅; the agency blurb puts all three in the medieval town). | HIGH [H][Gm] / MEDIUM (Rick's trip) |
 | **Nestor, the gardener, is Ulysses Moore.** Revealed in **B6**: **Rick finds out by breaking into Nestor's house.** | HIGH ✅ (Piemme synopsis: *"Rick l'ha scoperto facendo irruzione nella casa di Nestor"*) [H][Gm] |
 | The **First Key** (*Prima Chiave*) opens any Door, and is marked with **three turtles**. | HIGH (function) / MEDIUM (turtles) [H][Gk][Gm] |
 | **Black Vulcano never had the First Key.** B5 suggests he does; B6 shows that neither he nor the 1958 group ever found it. | MEDIUM [H][Gm] (Gm's quote from review R6) |
@@ -102,7 +127,7 @@ All three reports agree on these, or a primary source confirms them.
 |---|---|---|
 | **Jason Covenant** | 11, blond, blue-eyed. Impulsive, curious, drawn to ghosts and mysteries. **B1:** hears footsteps, finds the cliff box, spots the diary under the ship model, reads the floor inscription, uses the glowing clay, compares handwriting, chooses Egypt. **B2:** searches Punt with Rick and Maruk. **B4:** (LOW) goes back alone to deal with the intruders at Argo. **B5:** sneaks off to the lighthouse. **B6:** trapped in the medieval Garden with Julia. HIGH/MEDIUM [H][Gk][Gm] | Later romances are **LATER SERIES** (Anita Bloom, book 8). |
 | **Julia Covenant** | Jason's twin, slightly taller. Practical, sceptical at first, athletic, brave. **B1:** helps decode the parchment, turns the floor stones, jumps down the hatch first. **B2:** separated from the boys; defends Argo with Nestor in a storm and gets back a key Manfred took. **B6:** trapped in the Garden. HIGH/MEDIUM [H][Gk][Gm] | **Feelings for Rick grow in B4–B6**, making Jason jealous in B5. English Wikipedia: *"In the sixth book, Julia starts dating Rick Banner."* MEDIUM [H][Gm] |
-| **Rick Banner** | About 12, red-haired, a local who lives with his mother. Calm and analytical, knows the village. **B1:** sees the APRI acrostic. **B2:** uses the dictionary in Punt. **B4:** recognizes **Dedalus's typeface** in Venice. **B5:** examines the station machinery. **B6:** stays in Kilmore Cove and **unmasks Nestor**. HIGH [H][Gk][Gm] | **His father died searching for the First Key with Leonard Minaxo**, revealed in B6. MEDIUM ✅ [H][Gm]. His mother is named **Patricia** (LOW [Gm]). |
+| **Rick Banner** | About 12, red-haired, a local who lives with his mother. Calm and analytical, knows the village. **B1:** sees the APRI acrostic. **B2:** uses the dictionary in Punt. **B4:** recognizes **Dedalus's typeface** in Venice. **B5:** examines the station machinery. **B6:** stays in Kilmore Cove and **unmasks Nestor**, then goes to the Garden with Ulysses (MEDIUM ✅, Polish travel table). HIGH [H][Gk][Gm] | **His father died searching for the First Key with Leonard Minaxo**, revealed in B6. MEDIUM ✅ [H][Gm]. His mother is named **Patricia** (LOW [Gm]). |
 | **Mr and Mrs Covenant** | The parents. They buy Villa Argo, then go back to London to finish the move, leaving the children with Nestor. Mrs Covenant notices the scarred door and agrees to keep it covered. HIGH [H][Gm] | They know nothing about the Doors. First names and jobs are UNKNOWN. |
 
 ### Villa Argo and the antagonists
@@ -214,8 +239,8 @@ All three reports agree on these, or a primary source confirms them.
 | ↳ **English (Scholastic) edition** | — | **Owl – Porcupine – Elephant – Newt → OPEN** | MEDIUM [Gk][Gm, quoting an English student summary]. Not checked against a printed copy. |
 | **Cat key** | Door in Miss Cleopatra Biggles's house → **Punt** | Used by Oblivia in B2; used by Manfred and Gwendaline in B6 (LOW). | MEDIUM |
 | **Lion key** | House of Mirrors Door → **18th-century Venice** | Oblivia goes through at the end of B3. Who holds the key at each point is UNKNOWN. | MEDIUM |
-| **Horse key** | Railway tunnel Door → **Garden of Prester John** | B5. The original preview shows only ordinary padlock keys at the station, so **don't treat Fred's keys as the Horse key**. | MEDIUM |
-| **First Key / Three Turtles** (*Prima Chiave*) | **Any** Door | The goal of B3–B6. **Black Vulcano never had it.** Who ends up with it: possibly **Fred Dormiveglia**, via Patricia Banner and a charity raffle (LOW). | Function HIGH; turtles MEDIUM; owner LOW/UNKNOWN |
+| **Horse key** | Railway tunnel Door → **Garden of Prester John** | Station introduced in B5. Per the Polish travel table ✅, the station Door is **used in B6** by Ulysses, Rick, Zan-Zan and Phoenix Smith. The original preview shows only ordinary padlock keys at the station, so **don't treat Fred's keys as the Horse key**. | MEDIUM |
+| **First Key / Three Turtles** (*Prima Chiave*) | **Any** Door | The goal of B3–B6. **Black Vulcano never had it** ✅. At the end of B6, **Fred Dormiveglia** is said to have it (Spanish Wikipedia ✅, MEDIUM). How it reached him (Patricia Banner and a charity raffle) is LOW. | Function HIGH; turtles MEDIUM; owner at end of B6 MEDIUM |
 | **Whale, Dragon, Mammoth, Monkey, Goat, Raven keys** | Doors to later destinations | **LATER SERIES.** The children don't have or use them in B1–6. | — |
 
 ### Documents and objects
@@ -281,7 +306,7 @@ Scenes are numbered for sequencing, **not** chapter numbers. Each line gives: pl
 12. **Mirrors and light.** In abandoned corridors, guided by the ballad, they line up statues and mirrors with the light to find the hidden room. LOW (exact solution UNKNOWN)
 13. **The room that isn't there.** A hidden altar, a lamp going out, snakes; a **"sound key"** (chapter title). They get the map. HIGH (room) / LOW (details)
 14. **Oblivia takes the map.** HIGH (P3)
-15. **Return.** Julia gets back the key Manfred took; he falls off the cliff and survives. The boys say goodbye to Maruk and return home, probably **through the Argo Door** (Polish Wikipedia's travel table; LOW–MEDIUM). Oblivia uses the **Cat Door**. ✖ "The boys come out at Miss Biggles's house" is downgraded.
+15. **Return.** Julia gets back the key Manfred took; he falls off the cliff and survives. The boys say goodbye to Maruk and return home **through the Argo Door** (Polish Wikipedia's travel table ✅; MEDIUM). Oblivia uses the **Cat Door**. ✖ "The boys come out at Miss Biggles's house" is downgraded.
 
 **Real chapter titles (HIGH, P2):** *Sabato sera a Kilmore Cove, Oltre la Porta del Tempo, Il muro, Gli Ospiti, Confessioni notturne, La Collezione, L'arcano svelato, Il cercatore, I fattorini di Punt, L'ultimo indizio, La Ballata dei due innamorati, Lingua Tagliente e Cuore di Pietra, I Corridoi Abbandonati, La chiave sonora, La Stanza che non c'è, La resa dei conti, A casa, La fine della tempesta*.
 
@@ -325,7 +350,7 @@ Scenes are numbered for sequencing, **not** chapter numbers. Each line gives: pl
 7. **The valve room.** Fred: **red closed, blue open**, twice a week, paid by Black. HIGH (P5)
 8. **The riddle.** A poem roughly: *"half of sand and half of wind… fill your heart… at least a hundred."* Confirmed Italian fragments: ***"metà di sabbia e metà di vento"***, ***"devi riempire il tuo cuore"***. The full verse is only known in Hungarian (*"Félig homokkal és félig széllel / Töltsd fel szíved, ha itt felszállsz, / Bátor utazó, s barátod, hidd el, / Kell hogy legyen legalább száz"*). LOW–MEDIUM [Gm]. Possible meaning: the locomotive's firebox (the "heart") (LOW). **Don't use Gemini's reconstructed Italian lines as canon text.**
 9. **Into the tunnels.** Chapters *The Trap, Gears in Motion, Following Clio, Below the Surface, The Cave, Ascents and Descents, The Unknown Man*. HIGH (titles). **"Following Clio" may mean the CLIO train** rather than Clio Biggles (UNKNOWN).
-10. **The Garden Door.** They start Black Vulcano's **CLIO 1974** locomotive and go through the **Horse Door** into the Garden. LOW–MEDIUM [Gm][Gk]
+10. **To the Garden.** The station's **"Train of Eternal Youth"** comes back to life (agency blurb ✅). But per Polish Wikipedia's travel table ✅, **Jason and Julia (with Oblivia and Manfred) reach the Garden through the Villa Argo Door**, and the **station Door** is used in **B6** by Ulysses, Rick, Zan-Zan and Phoenix Smith. The CLIO 1974 name appears only in French Wikipedia's key table. The old claim that "the trio ride the CLIO through the Horse Door in B5" [Gm][Gk] is **LOW**.
 11. **The medieval Garden.** Chapters *Castaway, Corridor of Death, Intruders, Guardians of Time, Cloister, Truth*. At the end, the twins are in the Garden. HIGH (titles)
 
 ### BOOK 6: *La prima chiave / The First Key*
@@ -447,7 +472,7 @@ Scenes are numbered for sequencing, **not** chapter numbers. Each line gives: pl
 4. Treating the Venice "d" clue as a handwritten signature (it's a **printed typeface**, and Alberto printed the book).
 5. Treating the valve routine as a known solution (its purpose is unknown).
 6. **Giving Black Vulcano the First Key**, or having the children find it with him in the Garden.
-7. Putting Rick in the medieval maze in B6 (he's in Kilmore Cove).
+7. Putting Rick in the medieval Garden at the **start** of B6 (he's in Kilmore Cove, unmasks Nestor, and only then travels there with Ulysses).
 8. Using Atlantis, Agarthi, Thule or El Dorado as B1–6 destinations.
 9. **Mixing languages in the key puzzle:** Italian animals with "OPEN", or English animals with "APRI".
 10. Presenting anything invented as canon.
@@ -524,4 +549,4 @@ In order of importance for the game:
 - **Indonesian reader blog** ([link](https://santripunyacerita.home.blog/2020/05/18/spoiler-ulysses-moore-kali-ini-betulan/)): the fire, the photo, the B5 riddle fragments.
 - **I Just Read About That** ([link](https://ijustreadaboutthat.com/2010/01/26/pierdomenico-baccalario%E2%80%93ulysses-moore-no-more/)): Scholastic stopping at four books.
 
-**Note on checking:** this session's network blocked most of these sites, so Claude could only confirm the items marked ✅ (through search results). Everything else relies on the quotes the three models reported.
+**Note on checking:** the first merge could only confirm a few items through search results. The second check opened Polish, French, Spanish, Italian, Hungarian and English Wikipedia, reviews R5 and R6, the English B1 student blog, the Talos blog, the Indonesian blog and the agency's B5 and B6 pages directly. Its results are in "Second source check" at the top. The Polish fan wiki returned an error and is still unchecked. Wikipedias cover all 19 books, so a quote only counts for B1–6 when it sits in a B1–6 summary or a table row tagged with a B1–6 book number.
