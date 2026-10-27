@@ -33,3 +33,4 @@ To test networking on one PC, run two instances (Debug > Customize Run Instances
 ## Working agreements
 
 - Claude Code is a candidate for the single "main" coding agent (still an open question in GAME.md); other tools act as reviewers only.
+- Commit messages and PR descriptions carry no Claude attribution: no `Co-Authored-By`, `Claude-Session` or "Generated with Claude Code" lines.
