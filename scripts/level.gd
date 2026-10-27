@@ -9,6 +9,14 @@ extends Node3D
 var entries := {}
 ## A twin below this height has fallen and is put back at respawn_point().
 var fall_y := -40.0
+## Where Game places this level. Levels that can be loaded at the same time
+## (one twin in each, see Game) need origins far enough apart not to overlap.
+## Keep origins horizontal (y = 0) so fall_y still works. Set it in _init().
+var origin := Vector3.ZERO
+## This level's lighting; the camera of a twin in this level uses it.
+var environment: Environment:
+	get:
+		return _env
 
 var _env: Environment
 var _sun: DirectionalLight3D
@@ -41,6 +49,7 @@ func spawn_yaw(entry: String) -> float:
 
 
 ## Override for safe spots near the drop (e.g. the top of a cliff path).
+## Positions here, in spawn_point and in entries are local to the level.
 func respawn_point(role: String, _fell_from: Vector3) -> Vector3:
 	return spawn_point(role, "default")
 
@@ -50,14 +59,11 @@ func _entry(entry: String) -> Dictionary:
 
 
 func add_environment(background: Color) -> void:
-	var env := WorldEnvironment.new()
 	var e := Environment.new()
 	e.background_mode = Environment.BG_COLOR
 	e.background_color = background
 	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	e.ambient_light_color = Color(0.6, 0.6, 0.65)
-	env.environment = e
-	add_child(env)
 	_env = e
 	_day_background = background
 

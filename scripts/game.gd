@@ -1,11 +1,15 @@
 class_name Game
 extends Node
 ## Session root, alive from Host/Join until returning to the menu. Owns the
-## twins (Players + MultiplayerSpawner), the current level and the HUD.
-## The host decides which level is loaded and tells every peer (`_load_level`);
-## twins persist across levels and are teleported to the level's entry point.
+## twins (Players + MultiplayerSpawner), the loaded levels and the HUD.
+## The host decides which level each twin is in and tells every peer
+## (`_set_where`). Usually both share one level; when the story splits them
+## (book 2), each twin is in a different level. The host keeps every occupied
+## level loaded so it can validate and own all state; Julia's machine loads only
+## hers. Levels sit at their own `origin`, so two can be loaded at once without
+## overlapping. Twins persist across levels and are teleported to entry points.
 ## The client announces it has loaded this scene; only then does the host send
-## the state snapshot and level and spawn both twins, so nothing arrives before
+## the state snapshot and levels and spawn both twins, so nothing arrives before
 ## the client is ready for it.
 
 const PLAYER_SCENE := preload("res://scenes/player.tscn")
@@ -18,9 +22,15 @@ static var current: Game
 ## True while a menu (journal, text box) has focus; players ignore movement input.
 var input_blocked := false
 
-var level: Level
-var _level_path := ""
-var _entry := "default"
+## The level this peer's twin is in.
+var level: Level:
+	get:
+		return level_for(Net.my_role())
+## role -> level path, and role -> the entry point it arrived at.
+var _where := {"jason": "", "julia": ""}
+var _entries := {"jason": "default", "julia": "default"}
+## level path -> loaded Level
+var _levels := {}
 var _players: Node3D
 var _spawner: MultiplayerSpawner
 var _status: Label
@@ -64,7 +74,7 @@ func _ready() -> void:
 
 	if multiplayer.is_server():
 		GameState.reset()
-		_load_level(START_LEVEL, "default")
+		_set_where({"jason": START_LEVEL, "julia": START_LEVEL})
 		_status.text = "Hosting. Waiting for Julia to join..."
 	else:
 		_status.text = "You are Julia."
@@ -72,6 +82,10 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	# Each level has its own lighting; this peer's camera uses its twin's level.
+	var cam := get_viewport().get_camera_3d()
+	if cam and level and cam.environment != level.environment:
+		cam.environment = level.environment
 	if _toasts.is_empty():
 		return
 	for t in _toasts:
@@ -94,6 +108,15 @@ func _unhandled_input(event: InputEvent) -> void:
 		_set_journal_open(not _journal.visible)
 	elif _journal.visible and event.is_action_pressed("ui_cancel"):
 		_set_journal_open(false)
+
+
+func level_for(role: String) -> Level:
+	return _levels.get(_where.get(role, ""))
+
+
+## True when both twins are in the same level.
+func together() -> bool:
+	return _where["jason"] == _where["julia"]
 
 
 func get_player(peer_id: int) -> Node3D:
@@ -177,30 +200,59 @@ func _close_ask(text: String) -> void:
 ## Sent by a twin's own peer after it fell and was put back at a safe spot.
 @rpc("any_peer", "call_local", "reliable")
 func announce_fall(role: String) -> void:
-	if role == "jason":
-		_show_local_toast("Jason slips! Julia and Rick haul him back to safety.")
-	else:
-		_show_local_toast("Julia slips! Jason and Rick haul her back to safety.")
+	_show_local_toast("%s slips, and scrambles back to safety." % role.capitalize())
 
 
-## Host: move both twins to another level.
+## Host: move both twins to `path` (or within it, if they're already there).
 func change_level(path: String, entry := "default") -> void:
+	_move({"jason": path, "julia": path}, ["jason", "julia"], entry)
+
+
+## Host: move only one twin, splitting them up or bringing them back together.
+func move_twin(role: String, path: String, entry := "default") -> void:
+	var where := _where.duplicate()
+	where[role] = path
+	_move(where, [role], entry)
+
+
+func _move(where: Dictionary, roles: Array, entry: String) -> void:
 	assert(multiplayer.is_server())
-	_load_level.rpc(path, entry)
+	for role in roles:
+		_entries[role] = entry
+	_set_where.rpc(where)
 	for p in get_players():
-		p.teleport.rpc(level.spawn_point(p.role, entry), level.spawn_yaw(entry))
+		if roles.has(p.role):
+			var l := level_for(p.role)
+			p.teleport.rpc(l.to_global(l.spawn_point(p.role, entry)), l.spawn_yaw(entry))
 
 
+## Loads the levels this peer needs and frees the rest. A level that stays
+## occupied is kept as it is.
 @rpc("authority", "call_local", "reliable")
-func _load_level(path: String, entry: String) -> void:
-	if level:
-		remove_child(level)
-		level.queue_free()
-	_level_path = path
-	_entry = entry
-	level = load(path).instantiate()
-	level.name = "Level"
-	add_child(level)
+func _set_where(where: Dictionary) -> void:
+	_where = where
+	var needed := {}
+	if multiplayer.is_server():
+		for role in where:
+			needed[where[role]] = true
+	else:
+		needed[where["julia"]] = true
+	for path in _levels.keys():
+		if not needed.has(path):
+			var old: Level = _levels[path]
+			_levels.erase(path)
+			remove_child(old)
+			old.queue_free()
+	for path in needed:
+		if path != "" and not _levels.has(path):
+			var l: Level = load(path).instantiate()
+			l.name = "Level_" + path.get_file().get_basename()
+			add_child(l)
+			l.position = l.origin
+			_levels[path] = l
+	# The host's own view shows only Jason's level (the other stays loaded and solid).
+	for path in _levels:
+		_levels[path].visible = _levels[path] == level
 
 
 @rpc("authority", "call_local", "reliable")
@@ -217,7 +269,7 @@ func _client_ready() -> void:
 	if _players.has_node(str(client_id)):
 		return
 	GameState.send_snapshot(client_id)
-	_load_level.rpc_id(client_id, _level_path, _entry)
+	_set_where.rpc_id(client_id, _where)
 	if not _players.has_node(str(1)):
 		_spawn("jason", 1)
 	_spawn("julia", client_id)
@@ -225,11 +277,12 @@ func _client_ready() -> void:
 
 
 func _spawn(role: String, peer_id: int) -> void:
+	var l := level_for(role)
 	_spawner.spawn({
 		"id": peer_id,
 		"role": role,
-		"pos": level.spawn_point(role, _entry),
-		"yaw": level.spawn_yaw(_entry),
+		"pos": l.to_global(l.spawn_point(role, _entries[role])),
+		"yaw": l.spawn_yaw(_entries[role]),
 	})
 
 

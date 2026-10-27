@@ -5,15 +5,19 @@ extends Interactable
 ## GameState condition holds, so later story states override earlier ones.
 ## `present` is the condition for the character to be here at all, and
 ## `stations` ([condition, position] pairs, last match wins) moves them along
-## as the story goes on.
+## as the story goes on; they walk there at `walk_speed` (0 = jump there).
 ## Story effects of talking go in `on_used` (runs after the line is chosen).
 
 @export var npc_name := ""
 @export var color := Color(0.5, 0.65, 0.4)
 @export var present := ""
+@export var walk_speed := 0.0
 
 var lines: Array = []
 var stations: Array = []
+
+var _walk: Tween
+var _target = null
 
 
 func _init() -> void:
@@ -43,9 +47,20 @@ func _build() -> void:
 
 func refresh() -> void:
 	visible = GameState.check(present)
+	var target = null
 	for station in stations:
 		if GameState.check(station[0]):
-			position = station[1]
+			target = station[1]
+	if target == null or target == _target:
+		return
+	_target = target
+	if _walk:
+		_walk.kill()
+	if walk_speed <= 0.0 or not is_node_ready():
+		position = target
+	else:
+		_walk = create_tween()
+		_walk.tween_property(self, "position", target, position.distance_to(target) / walk_speed)
 
 
 func current_line() -> String:

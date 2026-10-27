@@ -120,10 +120,8 @@ func _host() -> void:
 	check(not journal_ids("jason").has("floor_inscription"), "inscription entry is Julia's")
 	await move_me(Vector3(8.3, 1, -0.6))
 	await until(func() -> bool: return _julia_near(Vector3(8.3, 1, 0)), "Julia in the wave passage")
-	var old := lvl().get_instance_id()
 	await use("WavePassage")
-	await until(func() -> bool: return lvl() != null and lvl().get_instance_id() != old, "round room reloaded")
-	await wait(0.3)
+	await wait(0.5)
 	check(toast().contains("brings you back"), "wave passage loops back")
 	check(me().global_position.distance_to(Vector3(-0.8, 1, 2)) < 0.6, "back in the round room")
 
@@ -190,9 +188,8 @@ func _client() -> void:
 	await use("Inscription")
 	check(journal_ids("julia").has("floor_inscription"), "Julia reads the inscription")
 	check(node("Rick").current_line().contains("the moon"), "Rick reacts to the inscription")
-	var old := lvl().get_instance_id()
 	await move_me(Vector3(8.0, 1, 0.8))
-	await until(func() -> bool: return lvl() != null and lvl().get_instance_id() != old, "client round room reloaded")
+	await until(func() -> bool: return me().global_position.distance_to(Vector3(0.8, 1, 2)) < 0.6, "client back in the round room")
 	await until(func() -> bool: return gs().get_flag("under.candle_out", false), "candle out (client)")
 	for i in 4:
 		var top: float = [0.0, -2.0, -4.0, -6.0][i]

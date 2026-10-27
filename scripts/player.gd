@@ -3,6 +3,8 @@ extends CharacterBody3D
 ## to the other peer. Only the owner gets a camera, input and interaction.
 
 const COLORS := {"jason": Color(0.25, 0.5, 0.9), "julia": Color(0.95, 0.55, 0.2)}
+## Local clothes in Punt (book 2), while GameState flag "punt.disguised" is set.
+const DISGUISED_COLORS := {"jason": Color(0.85, 0.8, 0.65), "julia": Color(0.9, 0.85, 0.7)}
 const GRAVITY := 20.0
 const MOUSE_SENS := 0.003
 const STICK_LOOK_SPEED := 2.5
@@ -13,6 +15,7 @@ var speed := 6.0
 var jump_velocity := 7.0
 
 var _pivot: Node3D
+var _body_mat: StandardMaterial3D
 var _camera: Camera3D
 
 
@@ -36,9 +39,10 @@ func _build_body() -> void:
 	var cm := CapsuleMesh.new()
 	cm.radius = 0.4
 	cm.height = 1.8
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = COLORS.get(role, Color.WHITE)
-	cm.material = mat
+	_body_mat = StandardMaterial3D.new()
+	cm.material = _body_mat
+	GameState.changed.connect(func(_key: String) -> void: _update_color())
+	_update_color()
 	mesh.mesh = cm
 	add_child(mesh)
 
@@ -49,6 +53,11 @@ func _build_body() -> void:
 	nose.mesh = nm
 	nose.position = Vector3(0, 0.5, -0.45)
 	add_child(nose)
+
+
+func _update_color() -> void:
+	var colors := DISGUISED_COLORS if GameState.get_flag("punt.disguised", false) else COLORS
+	_body_mat.albedo_color = colors.get(role, Color.WHITE)
 
 
 func _build_sync() -> void:
@@ -123,9 +132,9 @@ func _physics_process(delta: float) -> void:
 	velocity.z = dir.z * speed
 	move_and_slide()
 
-	var level := Game.current.level
+	var level := Game.current.level_for(role)
 	if level and global_position.y < level.fall_y:
-		position = level.respawn_point(role, global_position)
+		position = level.to_global(level.respawn_point(role, level.to_local(global_position)))
 		velocity = Vector3.ZERO
 		Game.current.announce_fall.rpc(role)
 

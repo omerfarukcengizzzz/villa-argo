@@ -11,6 +11,7 @@ extends Level
 
 const VILLA_ARGO := "res://scenes/levels/villa_argo.tscn"
 const SELF := "res://scenes/levels/argo_underground.tscn"
+const PUNT := "res://scenes/levels/punt.tscn"
 const STAIR_TOPS := [0.0, -2.0, -4.0, -6.0]
 const STAIR_Z := [-10.75, -15.75, -20.75, -25.75]
 ## Floor stone targets (0 north, 1 east, 2 south, 3 west), stone 1 first.
@@ -63,7 +64,7 @@ func _physics_process(_delta: float) -> void:
 	if not multiplayer.is_server() or GameState.get_flag("under.candle_out", false):
 		return
 	for p in Game.current.get_players():
-		if p.global_position.z < -9.0:
+		if Game.current.level_for(p.role) == self and to_local(p.global_position).z < -9.0:
 			GameState.set_flag("under.candle_out")
 			Game.current.say("A cold draught rushes up the stairs and blows the candle out. Pitch black.")
 			return
@@ -244,11 +245,19 @@ func _build_cave() -> void:
 	helm.solved_flag = "metis.sailed"
 	helm.question = "Where should the Metis sail?"
 	helm.options = [["Egypt", true], ["Somewhere else... (the helm won't turn)", false]]
-	helm.on_used = func(_p: Node3D) -> void:
-		Game.current.say("Jason shouts: \"Egypt!\" The helm vibrates under his hands, and the Metis slides out into the mist. (Book 2, the Land of Punt, comes next.)")
-		GameState.add_journal("book1_end", "Towards the Ports of Dreams",
-			"We chose Egypt. The Metis carried us out of the cave and into the mist.")
+	helm.on_used = _sail
 	place(helm, "Helm", Vector3(0, deck_y + 1.2, -52))
+
+
+## End of book 1: the Metis sails, and book 2 starts in Punt.
+func _sail(_player: Node3D) -> void:
+	Game.current.say("Jason shouts: \"Egypt!\" The helm vibrates under his hands, and the Metis slides out into the mist.")
+	GameState.add_journal("book1_end", "Towards the Ports of Dreams",
+		"We chose Egypt. The Metis carried us out of the cave and into the mist.")
+	await get_tree().create_timer(4.0).timeout
+	GameState.set_flag("b2.started")
+	Game.current.change_level(PUNT)
+	Game.current.say("Book 2: The Long-Lost Map. The mist clears over a hot, bright harbour: the Land of Punt.")
 
 
 func _build_rick() -> void:

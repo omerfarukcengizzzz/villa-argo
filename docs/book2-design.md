@@ -1,6 +1,6 @@
 # Book 2 design: *The Long-Lost Map* (the Land of Punt)
 
-Draft for approval. Turns book 2 into the first Door level: Punt, the hunt for the map in "the room that isn't there", and Julia defending Villa Argo. Same conventions as `docs/book1-design.md`: every step cites the story reference (`docs/ulysses-moore-books-1-6-reference.md`, "ref") and is marked **canon** or **adaptation**.
+Approved (decisions at the end). Turns book 2 into the first Door level: Punt, the hunt for the map in "the room that isn't there", and Julia defending Villa Argo. Same conventions as `docs/book1-design.md`: every step cites the story reference (`docs/ulysses-moore-books-1-6-reference.md`, "ref") and is marked **canon** or **adaptation**.
 
 ## The big decision: split the twins
 
@@ -96,8 +96,14 @@ Pacing: Julia's storm (step 15) starts when Jason reaches the map shop, so neith
 
 Each pass is tested with headless two-player playthroughs (in `tests/`) before it's pushed.
 
-## Open choices
+## Decisions
 
-1. **Split the twins** as in the book (recommended), or keep both in Punt?
-2. Oblivia taking the map is **unavoidable** (it's canon and drives book 3). OK?
-3. Is it fine that Julia's half is shorter and more action (storm, chase) while Jason's is longer and more exploring? Julia's notes (step 14) keep her busy helping him while he finishes.
+1. The twins split, as in the book.
+2. Oblivia taking the map is unavoidable.
+3. Julia's half is shorter and more action; Jason's is longer and more exploring.
+
+## Status
+
+- **Pass A done:** split engine (`Game.move_twin`, level origins), `scripts/levels/punt.gd` (harbour, chest of clothes, guards, the Door hall, the town street, mastaba, the wall), and Julia's half in `scripts/levels/villa_argo.gd` (Nestor, Ulysses's notes, six windows that Manfred tries in a fixed order, 7 s apart, the stolen Owl key, the chase, the Door opened backwards: Newt, Elephant, Porcupine, Owl).
+- **Temporary until Pass B:** Ulysses's "ask it backwards" note is in the rubble of the fallen wall instead of the House of Life archive, and Julia's storm starts when she has read both notes rather than when Jason reaches the map shop.
+- **Pass C needs:** the Ballad and sound-key notes above fix the puzzle answers: the beam turns at exactly three mirrors from her eyes to his; the plates are struck MOON, SUN, STAR, SUN.

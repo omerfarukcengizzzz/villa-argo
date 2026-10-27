@@ -1,6 +1,7 @@
 class_name Door
 extends Interactable
-## A door that sinks into the floor once GameState flag `open_flag` is set.
+## A door that sinks into the floor while GameState flag `open_flag` is set
+## (and rises again if the flag is cleared).
 ## With `key_item` set it is a locked door: interacting while the twins hold that
 ## item opens it. With `free` it opens on interact. Otherwise it only opens from
 ## elsewhere (e.g. a puzzle).
@@ -47,14 +48,14 @@ func _build() -> void:
 
 
 func refresh() -> void:
-	if _opened or not is_open():
+	if _opened == is_open():
 		return
-	_opened = true
-	var open_y := -size.y / 2.0 - 0.1
+	_opened = is_open()
+	var y := -size.y / 2.0 - 0.1 if _opened else size.y / 2.0
 	if is_node_ready():
-		create_tween().tween_property(_body, "position:y", open_y, 1.5)
+		create_tween().tween_property(_body, "position:y", y, 1.0 if _opened else 0.4)
 	else:
-		_body.position.y = open_y
+		_body.position.y = y
 
 
 func _host_interact(player: Node3D) -> void:

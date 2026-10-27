@@ -10,6 +10,10 @@ extends Interactable
 @export var index := 0
 ## The key item ids in the right order, one per lock.
 var solution: Array = []
+## While GameState condition `alt_when` holds, `alt_solution` is the right order
+## instead (book 2: opening the Door from the house side).
+var alt_solution: Array = []
+@export var alt_when := ""
 
 var _label: Label3D
 
@@ -21,6 +25,10 @@ func _init() -> void:
 
 func _available() -> bool:
 	return not GameState.get_flag(door + ".open", false) and solution.any(func(k: String) -> bool: return GameState.has_item(k))
+
+
+func _solution() -> Array:
+	return alt_solution if alt_when != "" and GameState.check(alt_when) else solution
 
 
 func _build() -> void:
@@ -76,7 +84,7 @@ func _check_door() -> void:
 		placed.append(GameState.get_flag(_slot(i), ""))
 	if placed.has(""):
 		return
-	if placed == solution:
+	if placed == _solution():
 		GameState.set_flag(door + ".open")
 		Game.current.say("Click, click, click, click. The scarred door swings open.")
 		return

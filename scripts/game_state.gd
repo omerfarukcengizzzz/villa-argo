@@ -35,16 +35,21 @@ func has_journal(id: String) -> bool:
 
 ## Condition strings used by levels and interactables: "" is always true,
 ## "flag" means the flag is truthy, "item:id" means the twins hold that item,
-## "journal:id" means that journal entry exists, and a leading "!" negates.
+## "journal:id" means that journal entry exists, "flag=value" compares the
+## flag's value as text, a leading "!" negates, and " & " joins conditions.
 func check(cond: String) -> bool:
 	if cond == "":
 		return true
+	if cond.contains(" & "):
+		return Array(cond.split(" & ")).all(check)
 	if cond.begins_with("!"):
 		return not check(cond.substr(1))
 	if cond.begins_with("item:"):
 		return has_item(cond.substr(5))
 	if cond.begins_with("journal:"):
 		return has_journal(cond.substr(8))
+	if cond.contains("="):
+		return str(get_flag(cond.get_slice("=", 0), "")) == cond.get_slice("=", 1)
 	return bool(get_flag(cond, false))
 
 
@@ -65,6 +70,12 @@ func give_item(id: String, display_name: String) -> void:
 	assert(multiplayer.is_server())
 	if not has_item(id):
 		_give_item.rpc(id, display_name)
+
+
+func take_item(id: String) -> void:
+	assert(multiplayer.is_server())
+	if has_item(id):
+		_take_item.rpc(id)
 
 
 func add_journal(id: String, title: String, body: String, who := "both") -> void:
@@ -88,6 +99,12 @@ func _set_flag(key: String, value: Variant) -> void:
 @rpc("authority", "call_local", "reliable")
 func _give_item(id: String, display_name: String) -> void:
 	inventory[id] = display_name
+	changed.emit("inventory")
+
+
+@rpc("authority", "call_local", "reliable")
+func _take_item(id: String) -> void:
+	inventory.erase(id)
 	changed.emit("inventory")
 
 

@@ -3,6 +3,9 @@ extends Level
 ## footsteps in the tower at night, the cliff box, the parchment cipher, the
 ## wardrobe, the tower diary and the four-key door. The post office trip is
 ## the kilmore_cove level. Behind the Door is the argo_underground level.
+## Book 2 (docs/book2-design.md, steps 13-17) also happens here: Julia alone
+## with Nestor on a storm night, Ulysses's notes, Manfred at the windows, the
+## stolen Owl key and the chase to the cliff, and reopening the Door.
 ## Layout is adaptation (no canon floor plan); rooms and objects follow the
 ## story reference.
 ##
@@ -19,12 +22,31 @@ const KEYS := ["owl_key", "porcupine_key", "elephant_key", "newt_key"]
 const CIPHER := {"#": "C", "@": "A", "%": "V", "&": "E", "$": "S", "*": "H", "!": "I", "?": "P",
 	"+": "R", "=": "T", "~": "O", "^": "N", ">": "D", "<": "K"}
 const PARCHMENT := "#  @  %  &        $  *  !  ?"
+## Book 2: from the house side, the Door opens with the keys "backwards".
+const KEYS_BACKWARDS := ["newt_key", "elephant_key", "porcupine_key", "owl_key"]
+
+## Book 2 storm windows: [inside position, yaw, where Manfred stands outside, name].
+const WINDOWS := [
+	[Vector3(-11.6, 2, -5), 90.0, Vector3(-13.5, 1, -5), "library"],
+	[Vector3(-2.6, 2, 9.6), 0.0, Vector3(-2.6, 1, 11.5), "hall, left of the front door"],
+	[Vector3(2.6, 2, 9.6), 0.0, Vector3(2.6, 1, 11.5), "hall, right of the front door"],
+	[Vector3(11.6, 2, -8.5), 90.0, Vector3(13.5, 1, -8.5), "stone sitting room"],
+	[Vector3(-3.6, 2, -14), 90.0, Vector3(-5.5, 1, -14), "west side of the tower stairs"],
+	[Vector3(3.6, 2, -14), 90.0, Vector3(5.5, 1, -14), "east side of the tower stairs"],
+]
+## The order Manfred tries them, one every WINDOW_SECONDS.
+const WINDOW_ORDER := [1, 2, 3, 5, 4, 0]
+const WINDOW_SECONDS := 7.0
+## Manfred's run from the stone sitting room to the cliff edge.
+const CHASE := [Vector3(0, 1, 4), Vector3(0, 1, 13), Vector3(-14, 1, 12), Vector3(-20, 1, 0.5), Vector3(-23.2, 1, 0.5)]
+const CHASE_SECONDS := 2.2
 
 const WALL := Color(0.62, 0.58, 0.52)
 const WOOD := Color(0.42, 0.3, 0.2)
 const GROUND := Color(0.45, 0.5, 0.38)
 
 var _parchment_label: Label3D
+var _storm_t := 0.0
 
 
 func _build() -> void:
@@ -41,6 +63,7 @@ func _build() -> void:
 	_build_house()
 	_build_tower()
 	_build_cliff()
+	_build_storm()
 
 	GameState.changed.connect(_on_state_changed)
 	_on_state_changed("")
@@ -59,11 +82,21 @@ func _on_state_changed(_key: String) -> void:
 
 # --- Story --------------------------------------------------------------------
 
-func _physics_process(_delta: float) -> void:
-	if not multiplayer.is_server() or not GameState.get_flag("argo.night", false) or GameState.get_flag("argo.footsteps", false):
+func _physics_process(delta: float) -> void:
+	if not multiplayer.is_server():
+		return
+	_check_footsteps()
+	_run_storm(delta)
+
+
+func _check_footsteps() -> void:
+	if not GameState.get_flag("argo.night", false) or GameState.get_flag("argo.footsteps", false):
 		return
 	var jason := Game.current.get_player(1)
-	if jason and absf(jason.global_position.x) < 4.0 and jason.global_position.z < -10.5:
+	if jason == null or Game.current.level_for("jason") != self:
+		return
+	var at := to_local(jason.global_position)
+	if absf(at.x) < 4.0 and at.z < -10.5:
 		_hear_footsteps()
 
 
@@ -124,7 +157,14 @@ func _build_courtyard() -> void:
 		["argo.rick_here", "Your parents caught the early train to London. They'll be a few days. I'll be in the garden. And stay off that cliff path."],
 		["argo.cipher_solved", "Hmph. Reading old papers, are we? Mind the dust."],
 		["argo_door.open", "Hmph."],
+		["b2.split", "Julia? Soaked through, and alone? Where are the boys?... Never mind that now. There's a storm coming in off the sea. Stay inside, away from the windows."],
+		["journal:ballad_notes", "That's Ulysses's hand. He and Penelope used to sit in the library on stormy nights, reading old songs to each other. She's gone now. Long gone."],
+		["storm.phase=windows", "Shut the windows, girl! I'll hold the front door!"],
+		["storm.phase=chase", "After him! The brute's heading for the cliff!"],
+		["storm.phase=fallen", "Over the cliff? His sort always crawl out of the sea. Have you got the key back?"],
+		["b2.split & argo_door.open", "You opened it from this side... Then we wait for the boys."],
 	]
+	nestor.stations = [["", Vector3(4, 1, 17)], ["b2.split", Vector3(1.5, 1, 7)]]
 	nestor.on_used = _talk_nestor
 	place(nestor, "Nestor", Vector3(4, 1, 17))
 
@@ -180,7 +220,7 @@ func _build_house() -> void:
 	var rick := Npc.new()
 	rick.npc_name = "Rick"
 	rick.color = Color(0.85, 0.4, 0.2)
-	rick.present = "argo.rick_here"
+	rick.present = "argo.rick_here & !b2.started"
 	rick.lines = [
 		["argo.rick_here", "I'm Rick, Rick Banner. Everybody in Kilmore Cove talks about this house. They say Ulysses Moore used to go down the cliff path behind the garden."],
 		["item:parchment", "Those symbols... There's a huge old dictionary in your library. Julia, you're good at this sort of thing."],
@@ -254,6 +294,8 @@ func _build_stone_room() -> void:
 		lock.door = "argo_door"
 		lock.index = i
 		lock.solution = KEYS
+		lock.alt_solution = KEYS_BACKWARDS
+		lock.alt_when = "b2.split"
 		lock.requires = "argo.wardrobe_moved"
 		place(lock, "Lock%d" % i, Vector3(11.75, 1.3, -5.6 + 0.4 * i))
 
@@ -391,3 +433,155 @@ func _add_cracked_ledge(top: Vector3, color: Color) -> void:
 		crack.rotation_degrees.y = angle
 		Vis.make_private(crack, "julia")
 		add_child(crack)
+
+
+# --- Book 2: the storm (Julia's half) ----------------------------------------------
+
+## Step 14: Ulysses's notes (only Julia is home to read them; she passes them on
+## to Jason). Step 15: windows to shut, and Manfred. Step 16: the Owl key.
+func _build_storm() -> void:
+	var ballad := JournalNote.new()
+	ballad.who = "julia"
+	ballad.entry_who = "julia"
+	ballad.requires = "b2.split"
+	ballad.entry_id = "ballad_notes"
+	ballad.title = "Ulysses's copy of the Ballad"
+	ballad.body = "The Ballad of Two Lovers, in Ulysses's hand, with notes in the margin:\n\"She looks to the morning, he looks to the night;\nbetween them the shadows, between them the light.\nTurn the bright waters three times on the way,\nand their eyes will meet at the close of the day.\"\n\nMargin: \"The light from the roof falls on her face first. Bright waters = the mirrors. Three turns, no more, and the light must end in his eyes. Where their eyes meet, the room that isn't there will open.\"\n\nJason needs to hear this."
+	ballad.prompt = "Read Ulysses's notes"
+	ballad.size = Vector3(0.5, 0.05, 0.4)
+	place(ballad, "BalladNotes", Vector3(-8.6, 0.95, -3.5))
+
+	var sound := JournalNote.new()
+	sound.who = "julia"
+	sound.entry_who = "julia"
+	sound.requires = "b2.split"
+	sound.entry_id = "sound_key_notes"
+	sound.title = "The sound key"
+	sound.body = "A loose page in Ulysses's hand:\n\"The altar answers to bronze, not to iron. Strike the plates as the lovers met: MOON, SUN, STAR, SUN.\"\n\nJason needs to hear this too."
+	sound.prompt = "Read the loose page"
+	sound.size = Vector3(0.4, 0.05, 0.3)
+	place(sound, "SoundKeyNotes", Vector3(-7.4, 0.95, -3.5))
+
+	for i in WINDOWS.size():
+		var w := Shutter.new()
+		w.who = "julia"
+		w.requires = "storm.phase=windows"
+		w.closed_flag = "storm.window%d" % i
+		place(w, "Window%d" % i, WINDOWS[i][0]).rotation_degrees.y = WINDOWS[i][1]
+
+	var manfred := Npc.new()
+	manfred.npc_name = "Manfred"
+	manfred.color = Color(0.25, 0.25, 0.3)
+	manfred.who = "nobody"
+	manfred.present = "storm.manfred"
+	manfred.walk_speed = 7.0
+	var stations := [["", WINDOWS[WINDOW_ORDER[0]][2]]]
+	for k in WINDOW_ORDER.size():
+		stations.append(["storm.phase=windows & storm.step=%d" % k, WINDOWS[WINDOW_ORDER[k]][2]])
+	stations.append(["storm.phase=breakin", Vector3(9.5, 1, -5)])
+	for k in CHASE.size():
+		stations.append(["storm.phase=chase & storm.chase=%d" % k, CHASE[k]])
+	stations.append(["storm.phase=edge", CHASE[-1]])
+	manfred.stations = stations
+	place(manfred, "Manfred", WINDOWS[WINDOW_ORDER[0]][2])
+
+	var key := Pickup.new()
+	key.who = "julia"
+	key.item_id = "owl_key"
+	key.item_name = "Owl key"
+	key.appears = "storm.phase=fallen"
+	key.prompt = "Pick up the Owl key"
+	place(key, "DroppedOwlKey", Vector3(-22.4, 1, 1.8))
+
+
+## Host: drives the storm while Julia is in the house. Phases (flag
+## storm.phase): "" -> arriving -> windows -> breakin -> chase -> edge -> fallen.
+func _run_storm(delta: float) -> void:
+	if not GameState.get_flag("b2.split", false) or Game.current.level_for("julia") != self:
+		return
+	_storm_t += delta
+	match str(GameState.get_flag("storm.phase", "")):
+		"":
+			if GameState.has_journal("ballad_notes") and GameState.has_journal("sound_key_notes"):
+				_storm_t = 0.0
+				GameState.set_flag("storm.phase", "arriving")
+				Game.current.say("Through the rain, headlights sweep across the garden. A huge man climbs out of a car and starts circling the house.", "julia")
+		"arriving":
+			if _storm_t > 4.0:
+				_start_windows()
+		"windows":
+			if _storm_t >= WINDOW_SECONDS:
+				_storm_t = 0.0
+				_manfred_tries_window()
+		"breakin":
+			if _storm_t > 3.0:
+				_steal_key()
+		"chase":
+			if _storm_t >= CHASE_SECONDS:
+				_storm_t = 0.0
+				var k: int = GameState.get_flag("storm.chase", 0)
+				if k + 1 < CHASE.size():
+					GameState.set_flag("storm.chase", k + 1)
+				else:
+					GameState.set_flag("storm.phase", "edge")
+		"edge":
+			var julia := _julia()
+			if julia and to_local(julia.global_position).distance_to(CHASE[-1]) < 6.0:
+				_manfred_falls()
+
+
+func _julia() -> Node3D:
+	for p in Game.current.get_players():
+		if p.role == "julia":
+			return p
+	return null
+
+
+func _start_windows() -> void:
+	_storm_t = 0.0
+	for i in WINDOWS.size():
+		GameState.set_flag("storm.window%d" % i, false)
+	GameState.set_flag("storm.step", 0)
+	GameState.set_flag("storm.manfred")
+	GameState.set_flag("storm.phase", "windows")
+	Game.current.say("It's Manfred! Shut the windows before he gets to them! He's heading for the %s." % WINDOWS[WINDOW_ORDER[0]][3], "julia")
+
+
+## Canon (MEDIUM): Julia shuts doors and windows against Manfred. Adaptation:
+## he tries them in a fixed order; one left open and he's in, and Nestor drives
+## him out but the wind blows every window open again.
+func _manfred_tries_window() -> void:
+	var step: int = GameState.get_flag("storm.step", 0)
+	var w: int = WINDOW_ORDER[step]
+	if not GameState.get_flag("storm.window%d" % w, false):
+		for i in WINDOWS.size():
+			GameState.set_flag("storm.window%d" % i, false)
+		GameState.set_flag("storm.step", 0)
+		Game.current.say("Manfred shoves the %s window open and climbs halfway in! Nestor drives him back out with a rake, but the wind bangs every window open again. He's going round again, starting at the %s." % [WINDOWS[w][3], WINDOWS[WINDOW_ORDER[0]][3]], "julia")
+		return
+	if step + 1 < WINDOW_ORDER.size():
+		GameState.set_flag("storm.step", step + 1)
+		Game.current.say("The %s window holds. Manfred heads for the %s." % [WINDOWS[w][3], WINDOWS[WINDOW_ORDER[step + 1]][3]], "julia")
+	else:
+		_storm_t = 0.0
+		GameState.set_flag("storm.phase", "breakin")
+		Game.current.say("Every window holds... then glass shatters at the back of the house. Manfred is inside!", "julia")
+
+
+## Canon (MEDIUM): Manfred steals a key. Adaptation: the Owl key, from the Door.
+func _steal_key() -> void:
+	_storm_t = 0.0
+	for i in KEYS.size():
+		if GameState.get_flag("argo_door.slot%d" % i, "") == "owl_key":
+			GameState.set_flag("argo_door.slot%d" % i, "")
+	GameState.take_item("owl_key")
+	GameState.set_flag("storm.chase", 0)
+	GameState.set_flag("storm.phase", "chase")
+	Game.current.say("Manfred wrenches the Owl key out of the Door and runs for the garden!", "julia")
+
+
+## Canon (MEDIUM): he falls off the cliff and survives; Julia gets the key back.
+func _manfred_falls() -> void:
+	GameState.set_flag("storm.manfred", false)
+	GameState.set_flag("storm.phase", "fallen")
+	Game.current.say("Cornered at the edge, Manfred slips on the wet rocks and tumbles over the cliff. A moment later you hear a splash and a lot of cursing. He'll live. The Owl key lies on the rocks.", "julia")

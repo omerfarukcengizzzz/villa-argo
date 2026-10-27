@@ -7,6 +7,8 @@ extends Interactable
 @export var color := Color(0.95, 0.8, 0.25)
 ## Non-zero: drawn as a still box of this size instead of a spinning key.
 @export var box_size := Vector3.ZERO
+## GameState condition for the item to be here at all (e.g. after it's dropped).
+@export var appears := ""
 
 var _key: Node3D
 
@@ -16,7 +18,7 @@ func _init() -> void:
 
 
 func _available() -> bool:
-	return not GameState.has_item(item_id)
+	return not GameState.has_item(item_id) and GameState.check(appears)
 
 
 ## Gray-box key (an upright ring with a shaft below it), or a plain box.
@@ -55,7 +57,7 @@ func _process(delta: float) -> void:
 
 
 func refresh() -> void:
-	visible = is_available()
+	visible = not GameState.has_item(item_id) and GameState.check(appears)
 
 
 func _host_interact(player: Node3D) -> void:
