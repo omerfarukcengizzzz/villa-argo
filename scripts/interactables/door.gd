@@ -2,12 +2,15 @@ class_name Door
 extends Interactable
 ## A door that sinks into the floor once GameState flag `open_flag` is set.
 ## With `key_item` set it is a locked door: interacting while the twins hold that
-## item opens it. Without one it only opens from elsewhere (e.g. a puzzle).
+## item opens it. With `free` it opens on interact. Otherwise it only opens from
+## elsewhere (e.g. a puzzle).
 
 @export var size := Vector3(3, 4, 0.5)
 @export var open_flag := ""
 @export var key_item := ""
 @export var key_name := "a key"
+@export var free := false
+@export var color := Color(0.45, 0.3, 0.15)
 
 var _body: StaticBody3D
 var _opened := false
@@ -22,8 +25,8 @@ func is_open() -> bool:
 	return GameState.get_flag(open_flag, false)
 
 
-func is_available() -> bool:
-	return key_item != "" and not is_open()
+func _available() -> bool:
+	return (key_item != "" or free) and not is_open()
 
 
 func _build() -> void:
@@ -33,7 +36,7 @@ func _build() -> void:
 	var box := BoxMesh.new()
 	box.size = size
 	mesh.mesh = box
-	mesh.material_override = Vis.material(Color(0.45, 0.3, 0.15))
+	mesh.material_override = Vis.material(color)
 	_body.add_child(mesh)
 	var shape := CollisionShape3D.new()
 	var bs := BoxShape3D.new()
@@ -55,7 +58,9 @@ func refresh() -> void:
 
 
 func _host_interact(player: Node3D) -> void:
-	if GameState.has_item(key_item):
+	if free:
+		GameState.set_flag(open_flag)
+	elif GameState.has_item(key_item):
 		GameState.set_flag(open_flag)
 		Game.current.say("The %s turns. The door opens." % key_name)
 	else:

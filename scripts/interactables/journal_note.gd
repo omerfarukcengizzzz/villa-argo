@@ -15,7 +15,7 @@ func _init() -> void:
 	prompt = "Read"
 
 
-func is_available() -> bool:
+func _available() -> bool:
 	return not GameState.has_journal(entry_id)
 
 

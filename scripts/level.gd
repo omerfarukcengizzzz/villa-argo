@@ -7,6 +7,12 @@ extends Node3D
 
 ## entry name -> {"jason": Vector3, "julia": Vector3, "yaw": float (radians)}
 var entries := {}
+## A twin below this height has fallen and is put back at respawn_point().
+var fall_y := -40.0
+
+var _env: Environment
+var _sun: DirectionalLight3D
+var _day_background := Color.BLACK
 
 
 func _ready() -> void:
@@ -34,6 +40,11 @@ func spawn_yaw(entry: String) -> float:
 	return _entry(entry).get("yaw", 0.0)
 
 
+## Override for safe spots near the drop (e.g. the top of a cliff path).
+func respawn_point(role: String, _fell_from: Vector3) -> Vector3:
+	return spawn_point(role, "default")
+
+
 func _entry(entry: String) -> Dictionary:
 	return entries.get(entry, entries.get("default", {}))
 
@@ -47,11 +58,19 @@ func add_environment(background: Color) -> void:
 	e.ambient_light_color = Color(0.6, 0.6, 0.65)
 	env.environment = e
 	add_child(env)
+	_env = e
+	_day_background = background
 
-	var sun := DirectionalLight3D.new()
-	sun.rotation_degrees = Vector3(-55, 30, 0)
-	sun.shadow_enabled = true
-	add_child(sun)
+	_sun = DirectionalLight3D.new()
+	_sun.rotation_degrees = Vector3(-55, 30, 0)
+	_sun.shadow_enabled = true
+	add_child(_sun)
+
+
+func set_night(night: bool) -> void:
+	_env.background_color = Color(0.02, 0.03, 0.08) if night else _day_background
+	_env.ambient_light_color = Color(0.12, 0.14, 0.25) if night else Color(0.6, 0.6, 0.65)
+	_sun.light_energy = 0.15 if night else 1.0
 
 
 func add_box(size: Vector3, pos: Vector3, color: Color) -> StaticBody3D:
@@ -69,6 +88,25 @@ func add_box(size: Vector3, pos: Vector3, color: Color) -> StaticBody3D:
 	shape.shape = bs
 	body.add_child(shape)
 	add_child(body)
+	return body
+
+
+## A slope rising along -z (north) by `rise` over its length, for stairs.
+func add_ramp(width: float, length: float, rise: float, start: Vector3, color: Color) -> StaticBody3D:
+	var run := sqrt(length * length + rise * rise)
+	var body := add_box(Vector3(width, 0.3, run), start + Vector3(0, rise / 2.0, -length / 2.0), color)
+	body.rotation.x = atan2(rise, length)
+	return body
+
+
+## A climbable wall: a solid box plus a slightly larger Climbable zone that also
+## reaches past the top, so Jason can climb up and step off.
+func add_climb_wall(size: Vector3, pos: Vector3) -> StaticBody3D:
+	var body := add_box(size, pos, Color(0.3, 0.5, 0.25))
+	var zone := Climbable.new()
+	zone.size = size + Vector3(1.0, 1.4, 1.0)
+	zone.position = pos + Vector3(0, 0.7, 0)
+	add_child(zone)
 	return body
 
 

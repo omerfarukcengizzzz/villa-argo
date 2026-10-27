@@ -2,15 +2,21 @@ class_name Interactable
 extends Node3D
 ## Something a twin can use with the interact button. The owning player picks
 ## the nearest available one in reach and calls request(); the host validates
-## who pressed it and from where, then calls _host_interact(). Subclasses change
-## GameState there and redraw from GameState in refresh(), which runs on every
-## peer whenever state changes.
+## who pressed it and from where, then calls _host_interact() and on_used.
+## Subclasses change GameState there and redraw from GameState in refresh(),
+## which runs on every peer whenever state changes.
 
 ## Shown as "[E] / (X) <prompt>".
 @export var prompt := "Use"
 ## "both", "jason" or "julia".
 @export var who := "both"
 @export var reach := 1.6
+## GameState condition (see GameState.check) that must hold before it can be used.
+@export var requires := ""
+
+## Optional host-only story hook, called with the player after a validated use.
+## Levels use it to add journal entries or set flags.
+var on_used := Callable()
 
 ## Extra distance the host allows, since it sees the other twin slightly late.
 const LAG_TOLERANCE := 1.5
@@ -30,8 +36,12 @@ func allows(role: String) -> bool:
 	return who == "both" or who == role
 
 
-## Override: false hides the prompt (already used, locked behind something...).
 func is_available() -> bool:
+	return GameState.check(requires) and _available()
+
+
+## Override: false hides the prompt (already used, locked behind something...).
+func _available() -> bool:
 	return true
 
 
@@ -64,9 +74,18 @@ func _request() -> void:
 
 
 func _handle(peer_id: int) -> void:
+	var player := _validate(peer_id)
+	if player:
+		_host_interact(player)
+		if on_used.is_valid():
+			on_used.call(player)
+
+
+## Host: the player of `peer_id` if they may use this right now, else null.
+func _validate(peer_id: int) -> Node3D:
 	var player := Game.current.get_player(peer_id)
 	if player == null or not allows(player.role) or not is_available():
-		return
+		return null
 	if player.global_position.distance_to(global_position) > reach + LAG_TOLERANCE:
-		return
-	_host_interact(player)
+		return null
+	return player

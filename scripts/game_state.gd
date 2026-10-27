@@ -33,6 +33,19 @@ func has_journal(id: String) -> bool:
 	return journal.any(func(e: Dictionary) -> bool: return e["id"] == id)
 
 
+## Condition strings used by levels and interactables: "" is always true,
+## "flag" means the flag is truthy, "item:id" means the twins hold that item,
+## and a leading "!" negates either.
+func check(cond: String) -> bool:
+	if cond == "":
+		return true
+	if cond.begins_with("!"):
+		return not check(cond.substr(1))
+	if cond.begins_with("item:"):
+		return has_item(cond.substr(5))
+	return bool(get_flag(cond, false))
+
+
 func journal_for(role: String) -> Array:
 	return journal.filter(func(e: Dictionary) -> bool: return e["who"] == "both" or e["who"] == role)
 

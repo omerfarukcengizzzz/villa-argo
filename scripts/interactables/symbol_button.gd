@@ -15,7 +15,7 @@ func _init() -> void:
 	reach = 1.3
 
 
-func is_available() -> bool:
+func _available() -> bool:
 	return GameState.get_flag(puzzle + ".target", -1) >= 0 and not GameState.get_flag(puzzle + ".solved", false)
 
 

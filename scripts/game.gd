@@ -9,12 +9,13 @@ extends Node
 ## the client is ready for it.
 
 const PLAYER_SCENE := preload("res://scenes/player.tscn")
-const START_LEVEL := "res://scenes/levels/sandbox_puzzle_room.tscn"
-const TOAST_SECONDS := 3.0
+const START_LEVEL := "res://scenes/levels/villa_argo.tscn"
+const TOAST_SECONDS := 5.0
+const MAX_TOASTS := 3
 
 static var current: Game
 
-## True while a menu (journal) has focus; players ignore movement input.
+## True while a menu (journal, text box) has focus; players ignore movement input.
 var input_blocked := false
 
 var level: Level
@@ -25,8 +26,13 @@ var _spawner: MultiplayerSpawner
 var _status: Label
 var _prompt: Label
 var _toast: Label
-var _toast_left := 0.0
+## Recent messages, oldest first: [text, seconds left].
+var _toasts: Array = []
 var _journal: JournalUI
+var _ask: PanelContainer
+var _ask_label: Label
+var _ask_field: LineEdit
+var _ask_callback := Callable()
 
 
 func _enter_tree() -> void:
@@ -64,12 +70,20 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if _toast_left > 0.0:
-		_toast_left -= delta
-		_toast.modulate.a = clampf(_toast_left, 0.0, 1.0)
+	if _toasts.is_empty():
+		return
+	for t in _toasts:
+		t[1] -= delta
+	if _toasts[0][1] <= 0.0:
+		_toasts.pop_front()
+		_update_toast()
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _ask.visible:
+		if event.is_action_pressed("ui_cancel"):
+			_close_ask("")
+		return
 	if event.is_action_pressed("journal"):
 		_set_journal_open(not _journal.visible)
 	elif _journal.visible and event.is_action_pressed("ui_cancel"):
@@ -92,6 +106,37 @@ func show_prompt(text: String) -> void:
 ## Host: show `text` to both twins, or only to `who` ("jason" / "julia").
 func say(text: String, who := "both") -> void:
 	_toast_rpc.rpc(text, who)
+
+
+## Opens a text box on this peer's screen; `callback` gets the text on submit.
+func ask_text(question: String, callback: Callable) -> void:
+	if _journal.visible:
+		return
+	_ask_label.text = question
+	_ask_field.text = ""
+	_ask_callback = callback
+	_ask.visible = true
+	input_blocked = true
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	_ask_field.grab_focus()
+
+
+func _close_ask(text: String) -> void:
+	_ask.visible = false
+	input_blocked = false
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	if text.strip_edges() != "" and _ask_callback.is_valid():
+		_ask_callback.call(text)
+	_ask_callback = Callable()
+
+
+## Sent by a twin's own peer after it fell and was put back at a safe spot.
+@rpc("any_peer", "call_local", "reliable")
+func announce_fall(role: String) -> void:
+	if role == "jason":
+		_show_local_toast("Jason slips! Julia and Rick haul him back to safety.")
+	else:
+		_show_local_toast("Julia slips! Jason and Rick haul her back to safety.")
 
 
 ## Host: move both twins to another level.
@@ -202,7 +247,28 @@ func _build_hud() -> void:
 	_toast.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	_toast.position.y += 40
 	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_toast.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_toast.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_toast.custom_minimum_size.x = 900
 	layer.add_child(_toast)
+
+	_ask = PanelContainer.new()
+	_ask.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	_ask.custom_minimum_size = Vector2(420, 0)
+	_ask.position -= Vector2(210, 60)
+	_ask.visible = false
+	var box := VBoxContainer.new()
+	_ask.add_child(box)
+	_ask_label = Label.new()
+	box.add_child(_ask_label)
+	_ask_field = LineEdit.new()
+	_ask_field.text_submitted.connect(_close_ask)
+	box.add_child(_ask_field)
+	var ok := Button.new()
+	ok.text = "OK  (Enter)  /  Cancel (Esc)"
+	ok.pressed.connect(func() -> void: _close_ask(_ask_field.text))
+	box.add_child(ok)
+	layer.add_child(_ask)
 
 	_journal = JournalUI.new()
 	_journal.visible = false
@@ -210,7 +276,13 @@ func _build_hud() -> void:
 	layer.add_child(_journal)
 
 
+## Messages stack (newest last) so one doesn't hide another.
 func _show_local_toast(text: String) -> void:
-	_toast.text = text
-	_toast_left = TOAST_SECONDS
-	_toast.modulate.a = 1.0
+	_toasts.append([text, TOAST_SECONDS])
+	if _toasts.size() > MAX_TOASTS:
+		_toasts.pop_front()
+	_update_toast()
+
+
+func _update_toast() -> void:
+	_toast.text = "\n".join(_toasts.map(func(t: Array) -> String: return t[0]))

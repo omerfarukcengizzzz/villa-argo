@@ -6,18 +6,12 @@ extends Interactable
 @export_file("*.tscn") var level := ""
 ## Which entry point of the target level to arrive at.
 @export var entry := "default"
-## Only usable once this GameState flag is set (empty = always).
-@export var requires_flag := ""
 @export var gather_radius := 5.0
 
 
 func _init() -> void:
 	prompt = "Go through"
 	reach = 2.0
-
-
-func is_available() -> bool:
-	return requires_flag == "" or GameState.get_flag(requires_flag, false)
 
 
 func _build() -> void:

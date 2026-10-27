@@ -1,6 +1,6 @@
 # Book 1 design: *The Door to Time* (Villa Argo hub)
 
-Draft for approval. Turns book 1 into the first playable chapter: Villa Argo, the four keys, the Door, the passages below, and the Metis sailing for Egypt. Book 2 (Punt) is the first Door level and gets its own design.
+Approved (decisions at the end). Turns book 1 into the first playable chapter: Villa Argo, the four keys, the Door, the passages below, and the Metis sailing for Egypt. Book 2 (Punt) is the first Door level and gets its own design.
 
 Every step cites the story reference (`docs/ulysses-moore-books-1-6-reference.md`, "ref") and is marked **canon** (the books, per the ref's confidence label) or **adaptation** (invented for the game). Language: **English** (keys Owl, Porcupine, Elephant, Newt → OPEN; ref §6, MEDIUM).
 
@@ -38,7 +38,7 @@ Each step is one GameState flag, so the chapter survives rejoins and can be resu
 5. **Behind the wardrobe.** **Jason pushes the wardrobe** aside and reveals the four-keyhole door. *Canon: door behind the wardrobe (MEDIUM). Book: a pen rolls behind it; pushing is adaptation for Jason's role.*
 6. **The tower diary.** A ship model sits on a high shelf. **Jason climbs up and lifts it**; under it is Ulysses's diary, and a **post-office receipt** falls out (item). Julia reads the diary's handwriting into the journal (her private entry, used in step 12). *Canon: model on diary, receipt (MEDIUM). Climbing is adaptation.*
 7. **The post office.** Both twins go to Kilmore Cove (exit at the gate; both must be there). The clerk takes the receipt and hands over a **parcel: four animal keys** (Owl, Porcupine, Elephant, Newt) **and a second coded message**. Only Julia can read the message: a riddle about **four, three, two, one** and choosing a path. *Canon: parcel, keys, second message (MEDIUM). Wording is adaptation (ref: "exact wording unverified").*
-8. **The four keys (OPEN).** Each lock takes one key; Jason places keys (pick a key at each lock). **The first try fails**: any order but the right one makes the locks spring back. The answer is **O-P-E-N** (Owl, Porcupine, Elephant, Newt) left to right. Julia's half of the second message contains the hint ("ask the door what it must do"); Rick's NPC hint after two failures: "Look at the first letters." *Canon: one-key-each fails, the initials spell OPEN (MEDIUM–HIGH). Lock-picking UI and hint wording are adaptation.*
+8. **The four keys (OPEN).** Each lock takes one key; Jason places keys (pick a key at each lock). **The first try fails**: any order but the right one makes the locks spring back. The answer is **O-P-E-N** (Owl, Porcupine, Elephant, Newt) left to right. Julia's half of the second message contains the hint ("ask the door what it must do"); Rick's NPC hint after a failed try: "Look at the first letters." *Canon: one-key-each fails, the initials spell OPEN (MEDIUM–HIGH). Lock-picking UI and hint wording are adaptation.*
 9. **The round room.** Four exits; letters run together on the floor, drawn only for Julia. She splits them into words: "By night we move quickly, fearing the burning fire." Exits are marked sun, moon, flame and wave; the right one is **moon** (night, away from fire). Wrong exits lead round in a loop back to the room. *Canon: round room, four exits, run-together inscription (MEDIUM). Inscription is an English rendering of a LOW–MEDIUM quote; exit symbols and which exit is right are adaptation (ref: UNKNOWN).*
 10. **The dark stair.** The candle goes out. The stair is pitch black except near **glowing clay balls**. Julia carries the clay and places balls on the steps (interact); Jason climbs ahead and calls out where the next gap is. *Canon: candle out, glowing clay lights the way (MEDIUM). The split is adaptation.*
 11. **The floor stones.** Four numbered stones, each with an arrow. **Julia turns them** (90° per press). **Jason, standing on a ledge, sees the target arrows painted on the ceiling** (his private layer) and tells her which way each must point. The "four, three, two, one" riddle from step 7 gives the **order**: stone 4 first, then 3, 2, 1. Setting a stone out of order makes all four grind back to the start. When all four match, a hatch opens and **Julia jumps down first**. *Canon: Julia turns four stones 90° to open a hatch, jumps first (MEDIUM). Stone order and ceiling marks are adaptation (ref: order unknown).*
@@ -67,8 +67,13 @@ Each step is one GameState flag, so the chapter survives rejoins and can be resu
 
 Each pass is tested with the two-instance headless test before it's pushed, and replaces the `sandbox_*` levels once Pass A works.
 
-## Open choices
+## Decisions
 
-- Rick as an NPC (above) or left out entirely?
-- The night-time footsteps need a day/night switch; drop it if it's not worth it in gray-box.
-- Step 11: the "four, three, two, one" riddle sets the order of the stones, and Jason's ceiling arrows set their directions. Fine as adaptation?
+- Rick is an NPC whose lines follow progress, so he doubles as the hint system.
+- The night-time footsteps stay: talking to Nestor brings night; Jason going up to the tower hears them; morning follows, the parents leave and Rick arrives.
+- Step 11 as written (riddle sets the order, Jason's ceiling arrows set the directions).
+
+## Status
+
+- **Pass A done:** `scripts/levels/villa_argo.gd` and `scripts/levels/kilmore_cove.gd`. Parchment cipher answer: CAVE SHIP. The scarred Door opens onto a placeholder room until Pass B.
+- No sound yet: the footsteps are a Jason-only message until the art/audio pass.

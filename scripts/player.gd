@@ -6,6 +6,7 @@ const COLORS := {"jason": Color(0.25, 0.5, 0.9), "julia": Color(0.95, 0.55, 0.2)
 const GRAVITY := 20.0
 const MOUSE_SENS := 0.003
 const STICK_LOOK_SPEED := 2.5
+const CLIMB_SPEED := 3.0
 
 var role := "jason"
 var speed := 6.0
@@ -109,18 +110,37 @@ func _physics_process(delta: float) -> void:
 	if active and stick != Vector2.ZERO:
 		_look(-stick.x * STICK_LOOK_SPEED * delta, -stick.y * STICK_LOOK_SPEED * delta)
 
-	if not is_on_floor():
+	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back") if active else Vector2.ZERO
+	if is_climbing():
+		velocity.y = -input.y * CLIMB_SPEED
+	elif not is_on_floor():
 		velocity.y -= GRAVITY * delta
 	elif active and Input.is_action_just_pressed("jump"):
 		velocity.y = jump_velocity
 
-	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back") if active else Vector2.ZERO
 	var dir := (transform.basis * Vector3(input.x, 0, input.y)).normalized()
 	velocity.x = dir.x * speed
 	velocity.z = dir.z * speed
 	move_and_slide()
 
+	var level := Game.current.level
+	if level and global_position.y < level.fall_y:
+		position = level.respawn_point(role, global_position)
+		velocity = Vector3.ZERO
+		Game.current.announce_fall.rpc(role)
+
 	_update_focus(active)
+
+
+## Only Jason climbs: inside a climb zone while touching the wall or already
+## off the ground (so standing on top of a climbable crate is just standing).
+func is_climbing() -> bool:
+	if role != "jason" or (is_on_floor() and not is_on_wall()):
+		return false
+	for zone in get_tree().get_nodes_in_group("climbables"):
+		if zone.contains(global_position):
+			return true
+	return false
 
 
 ## Shows a prompt for the nearest interactable this twin may use, and asks the
