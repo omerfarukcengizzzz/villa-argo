@@ -82,6 +82,8 @@ The reference has the plot and the house's contents (illusions, machines, a ches
 
 - **Pass A done:** breakfast with Nestor starts book 3 and shares every journal entry so far; Jason gets his private memory of the map. `scripts/levels/kilmore_cove.gd` is now the whole village (the book 1 street and post office are unchanged): the square (statue of King William V, telephone box), Calypso's bookshop (atlases, A History of the Kings of England, the guide table), Miss Biggles's house and cats, the lighthouse and Minaxo, the railway to the boarded-up tunnel past the closed station, and the House of Mirrors (locked until Pass B). The checklist entry fills in as the four impossibilities are found; Calypso then gives Julia the guide; the marked landmarks are 3, 6 and 8 (any order); talking to Minaxo, Miss Biggles and Calypso afterwards gives the "Peter Dedalus" entry.
 
+- **Pass B done:** `scripts/levels/mirror_house.gd`, entered from the village once the "Peter Dedalus" entry is in. The maze is 5×5 cells: the walls on the true path are illusions drawn for one twin only; every other inner wall is solid, a third drawn for both and the rest for one twin only. The owl clock (Jason climbs the cabinet) opens at 4:15; the telephone then rings, and dialling Kilmore Cove 77 opens the chess room. Chess starts after 1. e4 e5: Bishop to c4 (black Nc6), Queen to h5 (black Nf6), Queen takes f7, mate; Julia sees the moves in a mirror only she can see, and only Jason can move the brass pieces; a wrong move resets the board. The study: Dedalus's notebooks (other Doors; the First Key, three turtles) and a photograph of him with Penelope Moore in Venice. The Lion Door mirror is there, not yet usable.
+
 ## Decisions
 
 1. Split-view mirror house: yes.

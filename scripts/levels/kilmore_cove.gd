@@ -5,7 +5,8 @@ extends Level
 ## 3-6): the impossible village (no maps, no signal, tracks to nowhere, the
 ## statue of a king who never reigned), Calypso's old tourist guide, the marks
 ## Jason remembers from the map, and the old residents who knew Ulysses and
-## Dedalus. The House of Mirrors opens in book 3 Pass B. Layout is adaptation.
+## Dedalus, then the way into the House of Mirrors (the mirror_house level).
+## Layout is adaptation.
 ##
 ## Map (north = -z): the main street (x -6..6) from the gate road (z 12) to the
 ## post office (z -8..-14). West: the square with the statue, phone box,
@@ -13,6 +14,7 @@ extends Level
 ## East: the railway to a sealed tunnel, and the House of Mirrors.
 
 const VILLA_ARGO := "res://scenes/levels/villa_argo.tscn"
+const MIRROR_HOUSE := "res://scenes/levels/mirror_house.tscn"
 const WALL := Color(0.75, 0.68, 0.6)
 const ROAD := Color(0.5, 0.5, 0.5)
 
@@ -31,6 +33,7 @@ const MARKS := "368"
 func _build() -> void:
 	entries = {
 		"default": {"jason": Vector3(-1.2, 1, 8), "julia": Vector3(1.2, 1, 8), "yaw": 0.0},
+		"mirror_house": {"jason": Vector3(32, 1, -13.5), "julia": Vector3(34, 1, -13.5), "yaw": PI},
 	}
 	add_environment(Color(0.6, 0.72, 0.85))
 
@@ -286,7 +289,11 @@ func _build_mirror_house() -> void:
 		add_child(m)
 	add_label("THE HOUSE OF MIRRORS", Vector3(33, 6, -15.7), 0)
 	add_box(Vector3(2, 3, 0.3), Vector3(33, 1.5, -15.8), Color(0.3, 0.2, 0.12))
-	add_label("(locked)", Vector3(33, 3.3, -15.5), 0).font_size = 24
+	var enter := LevelExit.new()
+	enter.level = MIRROR_HOUSE
+	enter.requires = "b3.dedalus"
+	enter.prompt = "Go into the House of Mirrors"
+	place(enter, "MirrorHouseDoor", Vector3(33, 1, -14.8))
 
 
 func _talk_calypso(_player: Node3D) -> void:
@@ -327,6 +334,6 @@ func _build_rick() -> void:
 		["b3.no_maps & b3.no_signal & b3.tracks & b3.king", "That's all four. Let's show Calypso: she knows everything about this village."],
 		["item:tourist_guide", "Jason, you saw the map in Punt. Can you remember where the marks were? Julia, check them against the guide."],
 		["journal:three_marks", "The lighthouse, the cat house and the House of Mirrors. Let's ask the people who live there."],
-		["b3.dedalus", "The House of Mirrors, then. It's locked... for now."],
+		["b3.dedalus", "The House of Mirrors, then. Come on: the door's not even locked."],
 	]
 	place(rick, "Rick", Vector3(2.5, 1, 6))
