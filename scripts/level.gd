@@ -29,6 +29,15 @@ func _ready() -> void:
 		_host_setup()
 
 
+## An unloaded level is only freed at the end of the frame; until then it must
+## not react to state changes (it's out of the tree: no multiplayer, no tweens).
+func _exit_tree() -> void:
+	for c in GameState.changed.get_connections():
+		var target: Object = c["callable"].get_object()
+		if target == self or (target is Node and is_ancestor_of(target)):
+			GameState.changed.disconnect(c["callable"])
+
+
 ## Override: build geometry and interactables. Runs on every peer.
 func _build() -> void:
 	pass

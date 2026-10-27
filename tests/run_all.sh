@@ -17,7 +17,8 @@ for t in tests/book*_pass_*.gd; do
 	wait $host
 	h=$?
 	passes=$(cat "$LOG/$name.host.log" "$LOG/$name.client.log" | grep -c PASS)
-	if [ $h -eq 0 ] && [ $c -eq 0 ]; then
+	errors=$(cat "$LOG/$name.host.log" "$LOG/$name.client.log" | grep -c "SCRIPT ERROR\|^ERROR")
+	if [ $h -eq 0 ] && [ $c -eq 0 ] && [ "$errors" -eq 0 ]; then
 		echo "ok    $name ($passes checks)"
 	else
 		echo "FAIL  $name (logs in $LOG)"

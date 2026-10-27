@@ -29,6 +29,8 @@ const IMPOSSIBLE := [
 const GUIDE := "AN ILLUSTRATED GUIDE TO KILMORE COVE (price sixpence)\n\n1. The statue of His Majesty King William V, in the square.\n2. The harbour and the fish market.\n3. The lighthouse on the northern headland, kept by Mr Leonard Minaxo.\n4. The post office.\n5. The church.\n6. Miss Biggles's house, famous for its cats.\n7. Calypso's bookshop.\n8. The House of Mirrors, home of Mr Peter Dedalus, inventor and watchmaker. Open to visitors daily at a quarter past four.\n9. The old mill.\n\nUseful numbers: the House of Mirrors, Kilmore Cove 77."
 const MARKS := "368"
 
+var _ruins: Node3D
+
 
 func _build() -> void:
 	entries = {
@@ -191,7 +193,9 @@ func _build_square() -> void:
 		["b3.no_maps & b3.no_signal & b3.tracks & b3.king", "So you've noticed. Most people never do. Here: this was printed long before you were born. Ulysses Moore used to come in for these."],
 		["journal:three_marks", "The House of Mirrors... Peter Dedalus. Clever, kind, impossible man. He built that house and then, one day, he simply wasn't there any more. Ulysses was his friend."],
 		["b3.dedalus", "If anyone could find out where Peter went, it's you three."],
+		["b3.escaped", "Thank goodness you're safe. Peter's house... Well, houses can be mended. People are harder."],
 	]
+	calypso.stations = [["", Vector3(-20, 1, -7)], ["b3.escaped", Vector3(34, 1, -11)]]
 	calypso.on_used = _talk_calypso
 	place(calypso, "Calypso", Vector3(-20, 1, -7))
 
@@ -244,7 +248,9 @@ func _build_lighthouse() -> void:
 	minaxo.lines = [
 		["", "This is a lighthouse, not a playground. Off you go."],
 		["journal:three_marks", "Ulysses sent you, did he? No... he couldn't have. Hmph. Yes, I knew him. And Peter Dedalus: the best watchmaker this coast ever had. His house is full of tricks. Mind you don't believe everything you see in there."],
+		["b3.escaped", "Bulldozers, on Peter's house! That woman will answer for it. Venice, you say? Then she's gone after him."],
 	]
+	minaxo.stations = [["", Vector3(-30, 1, -30.8)], ["b3.escaped", Vector3(36, 1, -12)]]
 	minaxo.on_used = func(_p: Node3D) -> void: _met("b3.met_minaxo")
 	place(minaxo, "Minaxo", Vector3(-30, 1, -30.8))
 
@@ -291,9 +297,23 @@ func _build_mirror_house() -> void:
 	add_box(Vector3(2, 3, 0.3), Vector3(33, 1.5, -15.8), Color(0.3, 0.2, 0.12))
 	var enter := LevelExit.new()
 	enter.level = MIRROR_HOUSE
-	enter.requires = "b3.dedalus"
+	enter.requires = "b3.dedalus & !b3.escaped"
 	enter.prompt = "Go into the House of Mirrors"
 	place(enter, "MirrorHouseDoor", Vector3(33, 1, -14.8))
+	# After book 3: half the house is rubble.
+	_ruins = Node3D.new()
+	add_child(_ruins)
+	for i in 7:
+		var rock := MeshInstance3D.new()
+		var b := BoxMesh.new()
+		b.size = Vector3(2.5 + (i % 3), 1.2 + (i % 2), 2.0)
+		rock.mesh = b
+		rock.material_override = Vis.material(Color(0.6, 0.62, 0.66))
+		rock.position = Vector3(27 + i * 2, 0.6, -17.5 - (i % 3) * 1.5)
+		rock.rotation_degrees.y = i * 29.0
+		_ruins.add_child(rock)
+	GameState.changed.connect(func(_k: String) -> void: _ruins.visible = GameState.get_flag("b3.escaped", false))
+	_ruins.visible = GameState.get_flag("b3.escaped", false)
 
 
 func _talk_calypso(_player: Node3D) -> void:
@@ -328,6 +348,7 @@ func _build_rick() -> void:
 		["", Vector3(2.5, 1, 6)],
 		["item:tourist_guide", Vector3(-17.5, 1, -2.5)],
 		["b3.dedalus", Vector3(31, 1, -14)],
+		["b3.escaped", Vector3(30, 1, -12)],
 	]
 	rick.lines = [
 		["b3.started", "Let's make a list of everything that's strange about this place. I've lived here all my life and I never noticed. The bookshop has atlases, there's the phone box, the old railway, and that statue in the square..."],
@@ -335,5 +356,6 @@ func _build_rick() -> void:
 		["item:tourist_guide", "Jason, you saw the map in Punt. Can you remember where the marks were? Julia, check them against the guide."],
 		["journal:three_marks", "The lighthouse, the cat house and the House of Mirrors. Let's ask the people who live there."],
 		["b3.dedalus", "The House of Mirrors, then. Come on: the door's not even locked."],
+		["b3.escaped", "Venice. If Oblivia's gone after Dedalus, we'll have to go too. The Metis took us to Egypt... maybe it can take us there."],
 	]
 	place(rick, "Rick", Vector3(2.5, 1, 6))

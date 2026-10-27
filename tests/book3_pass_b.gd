@@ -197,7 +197,7 @@ func _host() -> void:
 	await use("Photograph")
 	check(gs().get_flag("b3.study_done", false) and journal_ids("both").has("other_doors") and journal_ids("both").has("venice_photo"), "other Doors, the First Key, and Venice")
 	await wait(1.5)
-	check(node("Rick").current_line().contains("Oblivia"), "Rick worries about Oblivia")
+	check(node("Rick").current_line().contains("hide") or node("Rick").current_line().contains("desk"), "Rick: someone's coming, hide (book 3 Pass C)")
 	gs().set_flag("test.done")
 	await until(func() -> bool: return game().get_players().size() == 1, "client finished", 30)
 	finished = true

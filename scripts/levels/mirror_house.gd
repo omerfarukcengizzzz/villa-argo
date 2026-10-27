@@ -4,8 +4,11 @@ extends Level
 ## true), the owl clock, the Bakelite telephone, the chess game across the
 ## centuries, and Dedalus's study. Canon: illusions, machines, the owl clock,
 ## the telephone, the chess game, the study's revelations (ref B3, HIGH/MEDIUM);
-## every mechanism and solution is adaptation. Oblivia's demolition crew and
-## the Lion Door are book 3 Pass C.
+## every mechanism and solution is adaptation. Then (steps 12-13) Oblivia
+## arrives with a demolition crew: the twins hide, watch her go through the
+## Lion Door to Venice (canon, MEDIUM-HIGH; they don't follow), and race out
+## before the house comes down (the race is adaptation). Phases (flag
+## b3.phase): "" -> crew -> oblivia -> race -> escaped.
 ##
 ## Map (north = -z): entrance hall z 0..6; the maze, 5x5 cells of 3 m
 ## (x -7.5..7.5, z -15..0); the clock room north of it (z -25..-15); the chess
@@ -13,6 +16,8 @@ extends Level
 
 const KILMORE_COVE := "res://scenes/levels/kilmore_cove.tscn"
 const MIRROR := Color(0.78, 0.84, 0.9)
+const RACE_SECONDS := 150
+const STUDY := Vector3(-16, 1, -31)
 const PLAIN := Color(0.6, 0.6, 0.65)
 
 ## The maze's true path, as cells (col, row; row 0 is north). Entrance south of
@@ -41,6 +46,8 @@ const MOVABLE := {"WhiteBishop": ["f1", "bishop"], "WhiteQueen": ["d1", "queen"]
 	"KingsKnight": ["g1", "knight"], "QueensKnight": ["b1", "knight"]}
 
 var _pieces: Node3D
+var _lion: MeshInstance3D
+var _phase_t := 0.0
 
 
 func _init() -> void:
@@ -57,6 +64,7 @@ func _build() -> void:
 	_build_clock_room()
 	_build_chess_room()
 	_build_study()
+	_build_finale()
 	_build_rick()
 
 	GameState.changed.connect(_on_state_changed)
@@ -65,6 +73,7 @@ func _build() -> void:
 
 func _on_state_changed(_key: String) -> void:
 	_draw_board()
+	_lion.visible = not GameState.get_flag("lion.open", false)
 	if multiplayer.is_server():
 		_check_clock()
 
@@ -84,6 +93,10 @@ func _build_hall() -> void:
 	out.level = KILMORE_COVE
 	out.entry = "mirror_house"
 	out.prompt = "Leave the House of Mirrors"
+	out.requires = "!b3.phase=crew & !b3.phase=oblivia"
+	out.on_used = func(_p: Node3D) -> void:
+		if str(GameState.get_flag("b3.phase", "")) == "race":
+			_escaped()
 	place(out, "ExitToVillage", Vector3(0, 1, 5))
 
 
@@ -406,23 +419,136 @@ func _build_study() -> void:
 	photo.on_used = func(_p: Node3D) -> void: _study_read()
 	place(photo, "Photograph", Vector3(-11.2, 1.0, -33))
 
-	# The Lion Door: book 3 Pass C.
-	var lion := MeshInstance3D.new()
+	# The Lion Door, behind the tallest mirror (canon, MEDIUM).
+	_lion = MeshInstance3D.new()
 	var lb := BoxMesh.new()
 	lb.size = Vector3(0.15, 3.2, 2)
-	lion.mesh = lb
+	_lion.mesh = lb
 	var shine := Vis.material(MIRROR)
 	shine.metallic = 1.0
 	shine.roughness = 0.05
-	lion.material_override = shine
-	lion.position = Vector3(-24.8, 1.6, -32.5)
-	add_child(lion)
+	_lion.material_override = shine
+	_lion.position = Vector3(-24.8, 1.6, -32.5)
+	add_child(_lion)
+	add_box(Vector3(0.1, 3.2, 2), Vector3(-25.1, 1.6, -32.5), Color(0.05, 0.05, 0.08))
 	add_label("a tall mirror framed with a carved lion's head", Vector3(-24.6, 3.6, -32.5), 90).font_size = 24
 
 
 func _study_read() -> void:
-	if GameState.has_journal("other_doors") and GameState.has_journal("venice_photo"):
+	if GameState.has_journal("other_doors") and GameState.has_journal("venice_photo") and not GameState.get_flag("b3.study_done", false):
 		GameState.set_flag("b3.study_done")
+		GameState.give_item("dedalus_notebook", "Dedalus's notebook")
+		GameState.set_flag("b3.phase", "crew")
+		Game.current.say("Engines roar outside. Heavy machines, and voices coming up the path. Quick, hide!")
+
+
+# --- Oblivia and the demolition race (steps 12-13) --------------------------------
+
+func _build_finale() -> void:
+	var desk := Switch.new()
+	desk.who = "jason"
+	desk.flag = "hide.jason"
+	desk.prompt = "Duck under the desk"
+	desk.requires = "b3.phase=crew"
+	place(desk, "HideDesk", Vector3(-12, 1, -34))
+	add_box(Vector3(0.2, 3, 2), Vector3(-8.2, 1.5, -35.5), Color(0.5, 0.15, 0.15))
+	add_label("heavy curtain", Vector3(-8.4, 3.2, -35.5), -90).font_size = 24
+	var curtain := Switch.new()
+	curtain.who = "julia"
+	curtain.flag = "hide.julia"
+	curtain.prompt = "Hide behind the curtain"
+	curtain.requires = "b3.phase=crew"
+	place(curtain, "HideCurtain", Vector3(-9, 1, -35.5))
+
+	var oblivia := Npc.new()
+	oblivia.npc_name = "Oblivia Newton"
+	oblivia.color = Color(0.6, 0.15, 0.3)
+	oblivia.who = "nobody"
+	oblivia.present = "b3.phase=oblivia & !lion.through"
+	oblivia.walk_speed = 3.0
+	oblivia.stations = [["", Vector3(-16, 1, -27)], ["b3.phase=oblivia", Vector3(-23.5, 1, -32.5)], ["lion.open", Vector3(-26, 1, -32.5)]]
+	place(oblivia, "Oblivia", Vector3(-16, 1, -27))
+	var manfred := Npc.new()
+	manfred.npc_name = "Manfred"
+	manfred.color = Color(0.25, 0.25, 0.3)
+	manfred.who = "nobody"
+	manfred.present = "b3.phase=oblivia"
+	manfred.walk_speed = 3.0
+	manfred.stations = [["", Vector3(-16, 1, -27)], ["b3.phase=oblivia", Vector3(-19, 1, -30)]]
+	place(manfred, "Manfred", Vector3(-15, 1, -26.5))
+
+	# Falling plaster in the chess room during the race.
+	for i in 3:
+		var plaster := Hazard.new()
+		plaster.active = "b3.phase=race"
+		plaster.size = Vector3(2.5, 1.0, 2.5)
+		plaster.color = Color(0.85, 0.82, 0.75)
+		plaster.label = "falling plaster"
+		plaster.respawn = Vector3(-16, 1, -26.5)
+		plaster.message = "Plaster crashes down in front of you! You stagger back."
+		plaster.travel = Vector3(0, -3.5, 0)
+		plaster.period = 3.0 + i * 0.7
+		plaster.phase = i * 1.7
+		place(plaster, "Plaster%d" % i, Vector3(-14 + i * 2.5, 4.0, -23 + i * 1.5))
+
+
+func _physics_process(delta: float) -> void:
+	if not multiplayer.is_server():
+		return
+	var phase := str(GameState.get_flag("b3.phase", ""))
+	_phase_t += delta
+	match phase:
+		"crew":
+			if GameState.get_flag("hide.jason", false) and GameState.get_flag("hide.julia", false):
+				_phase_t = 0.0
+				GameState.set_flag("b3.phase", "oblivia")
+				Game.current.say("Footsteps in the study. From your hiding places you see them: Oblivia Newton, and Manfred behind her.")
+		"oblivia":
+			if _phase_t > 4.0 and not GameState.get_flag("lion.open", false):
+				GameState.set_flag("lion.open")
+				Game.current.say("Oblivia runs a hand over the lion's head and turns a small golden key. The tall mirror swings open like a door. \"Venice, then. Let's see if dear Peter still remembers me.\"")
+			elif _phase_t > 8.0 and not GameState.get_flag("lion.through", false):
+				GameState.set_flag("lion.through")
+				GameState.add_journal("lion_door", "The Lion Door",
+					"We hid in Dedalus's study and saw it: Oblivia Newton opened the mirror with the lion's head using a small golden key, and stepped through. To Venice: she said so. She's going after Peter Dedalus.\nThe mirror closed behind her, and it won't open for us.")
+				Game.current.say("She steps through the mirror, and it swings shut. Manfred grins at the ceiling: \"You heard the lady. Bring it down!\" He stamps out. The walls begin to shake.")
+			elif _phase_t > 11.0:
+				GameState.set_flag("lion.open", false)
+				_start_race()
+		"race":
+			if _phase_t >= 1.0:
+				_phase_t = 0.0
+				var left: int = GameState.get_flag("race.left", RACE_SECONDS) - 1
+				GameState.set_flag("race.left", left)
+				if left > 0 and left % 30 == 0:
+					Game.current.say("The walls shake! %d seconds!" % left)
+				elif left <= 0:
+					_race_lost()
+
+
+func _start_race() -> void:
+	_phase_t = 0.0
+	GameState.set_flag("race.left", RACE_SECONDS)
+	GameState.set_flag("b3.phase", "race")
+	Game.current.say("The house is coming down! Get out, the way you came in! You have %d seconds." % RACE_SECONDS)
+
+
+## Time's up: the twins wake in the study, and the crew starts again.
+func _race_lost() -> void:
+	for p in Game.current.get_players():
+		p.teleport.rpc(to_global(STUDY + Vector3(-1 if p.role == "jason" else 1, 0, 0)), PI)
+	GameState.set_flag("race.left", RACE_SECONDS)
+	Game.current.say("A beam crashes down and everything goes dark... You come round in the study, coughing. The crew is backing up for another go. Run!")
+
+
+## Host: both twins made it out (called by the hall exit).
+func _escaped() -> void:
+	GameState.set_flag("b3.phase", "escaped")
+	GameState.set_flag("b3.escaped")
+	Game.current.say("You burst out into the daylight just as half the house folds in behind you. Then Mr Minaxo and Calypso come striding up the road with half the village, and the crew decides to call it a day.")
+	GameState.add_journal("book3_end", "What we know now",
+		"Kilmore Cove isn't on any map. There are other Doors in it, and one key, the First Key, opens all of them.\nPeter Dedalus is in Venice, and Oblivia Newton has gone after him through the Lion Door. If he tells her where the First Key is...\nWe have to get to Venice before she finds him.")
+	Game.current.say_later("End of book 3: The House of Mirrors. (Book 4, The Isle of Masks, comes next.)", 5.0)
 
 
 func _build_rick() -> void:
@@ -435,6 +561,7 @@ func _build_rick() -> void:
 		["clock.solved", Vector3(3, 1, -17)],
 		["phone.solved", Vector3(-9, 1, -13.5)],
 		["chess.solved", Vector3(-9, 1, -30)],
+		["b3.phase=race", Vector3(1, 1, 3)],
 	]
 	rick.lines = [
 		["", "\"Don't trust your eyes. Trust each other.\" Tell each other what walls you see. If you both see it, it's real. If only one of you does... try walking through it."],
@@ -443,5 +570,7 @@ func _build_rick() -> void:
 		["phone.solved", "A chessboard. Julia, can you see anything in that mirror? Jason, the pieces are brass: you'll have to move them."],
 		["chess.solved", "His study! Look at everything."],
 		["b3.study_done", "Other Doors... and a key that opens all of them. If Oblivia's got the map, she knows where they are."],
+		["b3.phase=crew", "Someone's coming! Jason, under the desk! Julia, behind the curtain!"],
+		["b3.phase=race", "Run! Back through the chess room, the clock room and the maze! Mind the plaster!"],
 	]
 	place(rick, "Rick", Vector3(3, 1, 3.5))

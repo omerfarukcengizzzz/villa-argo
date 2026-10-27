@@ -13,6 +13,8 @@ extends Node3D
 @export var phase := 0.0
 @export var color := Color(0.25, 0.4, 0.15)
 @export var label := ""
+## GameState condition for the hazard to be there at all (empty = always).
+@export var active := ""
 
 var _base: Vector3
 
@@ -39,11 +41,14 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
+	visible = GameState.check(active)
 	if period > 0.0:
 		var t := Time.get_ticks_msec() / 1000.0
 		position = _base + travel * (0.5 - 0.5 * cos(TAU * t / period + phase))
 
 
 func contains(point: Vector3) -> bool:
+	if not GameState.check(active):
+		return false
 	var d := (point - global_position).abs()
 	return d.x <= size.x / 2.0 + 0.3 and d.y <= size.y / 2.0 + 0.5 and d.z <= size.z / 2.0 + 0.3
