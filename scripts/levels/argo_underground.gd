@@ -12,6 +12,7 @@ extends Level
 const VILLA_ARGO := "res://scenes/levels/villa_argo.tscn"
 const SELF := "res://scenes/levels/argo_underground.tscn"
 const PUNT := "res://scenes/levels/punt.tscn"
+const VENICE := "res://scenes/levels/venice.tscn"
 const STAIR_TOPS := [0.0, -2.0, -4.0, -6.0]
 const STAIR_Z := [-10.75, -15.75, -20.75, -25.75]
 ## Floor stone targets (0 north, 1 east, 2 south, 3 west), stone 1 first.
@@ -247,6 +248,20 @@ func _build_cave() -> void:
 	helm.options = [["Egypt", true], ["Somewhere else... (the helm won't turn)", false]]
 	helm.on_used = _sail
 	place(helm, "Helm", Vector3(0, deck_y + 1.2, -52))
+
+	# Book 4: the Metis to Venice (canon: the Argo Door and the Metis, MEDIUM).
+	var to_venice := Helm.new()
+	to_venice.requires = "b4.started & !b4.sailed"
+	to_venice.answer = "Venice"
+	to_venice.solved_flag = "b4.sailed"
+	to_venice.question = "Where should the Metis sail?"
+	to_venice.wrong_text = "The helm won't turn. The Metis seems to know where you need to go."
+	to_venice.options = [["Egypt", true], ["Venice", true]]
+	to_venice.on_used = func(_p: Node3D) -> void:
+		GameState.set_flag("b4.away")
+		Game.current.change_level(VENICE)
+		Game.current.say("The helm shudders, the mist closes in... and opens on a lagoon full of bells: Venice.")
+	place(to_venice, "HelmVenice", Vector3(0, deck_y + 1.2, -52))
 
 
 ## End of book 1: the Metis sails, and book 2 starts in Punt.

@@ -1,14 +1,16 @@
 class_name LevelExit
 extends Interactable
 ## Takes both twins to another level. Both must be close by, so nobody gets
-## dragged along from across the map. With `solo`, it moves only the twin who
-## uses it (for when the story has split them up).
+## dragged along from across the map. With `solo` (or while the condition
+## `solo_when` holds), it moves only the twin who uses it, for when the story
+## has split them up.
 
 @export_file("*.tscn") var level := ""
 ## Which entry point of the target level to arrive at.
 @export var entry := "default"
 @export var gather_radius := 5.0
 @export var solo := false
+@export var solo_when := ""
 
 
 func _init() -> void:
@@ -28,7 +30,7 @@ func _build() -> void:
 
 
 func _host_interact(player: Node3D) -> void:
-	if solo:
+	if solo or (solo_when != "" and GameState.check(solo_when)):
 		Game.current.move_twin(player.role, level, entry)
 		return
 	var players := Game.current.get_players()

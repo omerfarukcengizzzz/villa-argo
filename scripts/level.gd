@@ -125,6 +125,26 @@ func add_climb_wall(size: Vector3, pos: Vector3) -> StaticBody3D:
 	return body
 
 
+## Host: whether `watcher` (facing its local -z) can see `target`: within
+## `radius`, inside a cone of `fov_degrees`, and not behind a wall. For
+## patrolling guards and dogs.
+func sees(watcher: Node3D, target: Node3D, radius: float, fov_degrees := 120.0) -> bool:
+	var to := target.global_position - watcher.global_position
+	to.y = 0.0
+	if to.length() > radius:
+		return false
+	if to.length() < 1.0:
+		return true
+	var forward := -watcher.global_transform.basis.z
+	forward.y = 0.0
+	if rad_to_deg(forward.normalized().angle_to(to.normalized())) > fov_degrees / 2.0:
+		return false
+	var ray := PhysicsRayQueryParameters3D.create(watcher.global_position + Vector3.UP * 0.5, target.global_position + Vector3.UP * 0.5)
+	for p in Game.current.get_players():
+		ray.exclude = ray.exclude + [p.get_rid()]
+	return get_world_3d().direct_space_state.intersect_ray(ray).is_empty()
+
+
 func add_label(text: String, pos: Vector3, yaw_degrees := 0.0) -> Label3D:
 	var label := Label3D.new()
 	label.text = text

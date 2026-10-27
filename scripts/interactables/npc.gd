@@ -59,6 +59,9 @@ func refresh() -> void:
 	if walk_speed <= 0.0 or not is_node_ready():
 		position = target
 	else:
+		var dir: Vector3 = target - position
+		if Vector2(dir.x, dir.z).length() > 0.01:
+			rotation.y = atan2(-dir.x, -dir.z)
 		_walk = create_tween()
 		_walk.tween_property(self, "position", target, position.distance_to(target) / walk_speed)
 

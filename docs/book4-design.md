@@ -1,6 +1,6 @@
 # Book 4 design: *The Isle of Masks* (18th-century Venice)
 
-Draft for approval. Same conventions as books 1–3: every step cites the story reference (`docs/ulysses-moore-books-1-6-reference.md`, "ref") and is marked **canon** or **adaptation**.
+Approved (decisions at the end). Same conventions as books 1–3: every step cites the story reference (`docs/ulysses-moore-books-1-6-reference.md`, "ref") and is marked **canon** or **adaptation**.
 
 Book 4 splits the party again, the other way round from book 2: the children sail to Venice, two Venetians slip through the Door into Villa Argo, and **Jason goes back alone** to deal with them while **Julia and Rick** search Venice for Peter Dedalus before Oblivia finds him (ref B4 scenes 2–3, LOW–MEDIUM). The book's chapters alternate between the storylines (ref B4, HIGH), so the split fits.
 
@@ -85,9 +85,14 @@ Venice is the best-documented door so far: masks and a secret guard, Count Cener
 2. **Pass B:** Julia's Venice up to Penelope's house (steps 8–11): masks and Count Cenere, the Callers, the "d", the print room, the girl's room, behind the frame.
 3. **Pass C:** Turtle Park to the end (steps 12–17): the pigeons, the Master Watchmaker, the Black Gondolier, Dedalus, Oblivia, the fire, and home.
 
-## Open choices
+## Status
 
-1. **Split as in the book** (Jason at Argo, Julia and Rick in Venice)?
-2. **Jason's half is short** (intruders, the library, the Old Owl). Fine, or should Jason come back through to Venice for the Isle of Masks finale (adaptation) so both are there for the end?
-3. **Watchers** (the dog at Argo, Count Cenere in Venice): being seen sends you back a bit. OK, or too stressful?
-4. The **Old Owl in the Argo attic** is my placement (the book doesn't say where it is). OK?
+- **Pass A done:** `scripts/levels/argo_attic.gd` (up the attic stairs in the hall; armour, the trunk with the guard's mask, the Old Owl: its slip, a keyhole that takes only the Owl key, and DEDA, which prints "The Black Gondolier waits where the last lamp burns on the Fondamenta of the Masks... SERENISSIMA"), a second helm on the Metis that only sails for Venice, `scripts/levels/venice.gd` (the mooring and the Door passage; the beggars slip through and Jason's chase splits the twins), and Jason's half in `scripts/levels/villa_argo.gd` (Nestor tied up in the stone sitting room, the dog patrolling the hall that sends Jason back if it sees him, the three stolen things in the tower, the library and the garden, the book on masks with Count Cenere's ash-grey mask and silver tear, and the mask that sends the beggars running).
+- **Temporary until Pass B:** Julia's two clues for Jason (what frightens beggars; the Owl key is the right key) are at the Venice mooring, not at the Callers' and in the print room.
+
+## Decisions
+
+1. Split as in the book: Jason at Argo, Julia and Rick in Venice.
+2. Jason's half stays short and follows the book; he does not rejoin in Venice for now (may change later).
+3. Watchers (the dog, Count Cenere) that send you back a bit: OK.
+4. The Old Owl in the Argo attic: OK.

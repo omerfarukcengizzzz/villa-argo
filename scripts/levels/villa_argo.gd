@@ -16,6 +16,16 @@ extends Level
 
 const KILMORE_COVE := "res://scenes/levels/kilmore_cove.tscn"
 const UNDERGROUND := "res://scenes/levels/argo_underground.tscn"
+const ATTIC := "res://scenes/levels/argo_attic.tscn"
+## Book 4: where the beggars stashed what they took: [item id, name, where].
+const LOOT := [
+	["telescope", "Ulysses's brass telescope", Vector3(-2, 5.4, -27.5)],
+	["candlesticks", "the silver candlesticks", Vector3(-10.8, 1.0, -1.5)],
+	["jewellery_box", "Mum's jewellery box", Vector3(-8, 0.4, 14)],
+]
+## The dog's patrol along the hall, one step every DOG_SECONDS.
+const DOG_ROUTE := [Vector3(0, 0.5, -8), Vector3(0, 0.5, -1), Vector3(0, 0.5, 6), Vector3(0, 0.5, -1)]
+const DOG_SECONDS := 3.0
 const KEYS := ["owl_key", "porcupine_key", "elephant_key", "newt_key"]
 ## Parchment cipher (adaptation; the reference says the real alphabet is
 ## unknown). The parchment reads CAVE SHIP; the extra pairs are decoys.
@@ -47,12 +57,14 @@ const GROUND := Color(0.45, 0.5, 0.38)
 
 var _parchment_label: Label3D
 var _storm_t := 0.0
+var _dog_t := 0.0
 
 
 func _build() -> void:
 	entries = {
 		"default": {"jason": Vector3(-1.5, 1, 22), "julia": Vector3(1.5, 1, 22)},
 		"gate": {"jason": Vector3(-1.5, 1, 23.5), "julia": Vector3(1.5, 1, 23.5)},
+		"attic": {"jason": Vector3(-2.6, 1, 6.6), "julia": Vector3(-1.4, 1, 6.6)},
 		"door": {"jason": Vector3(10, 1, -6), "julia": Vector3(10, 1, -4), "yaw": PI / 2},
 	}
 	fall_y = -20.0
@@ -64,6 +76,7 @@ func _build() -> void:
 	_build_tower()
 	_build_cliff()
 	_build_storm()
+	_build_intruders()
 
 	GameState.changed.connect(_on_state_changed)
 	_on_state_changed("")
@@ -87,6 +100,7 @@ func _physics_process(delta: float) -> void:
 		return
 	_check_footsteps()
 	_run_storm(delta)
+	_run_intruders(delta)
 
 
 func _check_footsteps() -> void:
@@ -169,8 +183,11 @@ func _build_courtyard() -> void:
 		["b2.home", "Back, are you? All three of you, sunburnt in a storm. I won't ask. Sit down, there's breakfast."],
 		["b3.started", "Off to the village, are you? Mind the cliff road."],
 		["b3.dedalus", "Dedalus... Yes, I knew him. I knew all of them, once. That was a long time ago."],
+		["b4.split", "Mmmf! Mmmmf!"],
+		["b4.nestor_free", "A man, a girl and a mangy dog, out of that door! They tied me up and went through the house like locusts: the tower, the library, the garden. Mind the dog. It barks at anything that moves."],
+		["b4.argo_safe", "Gone, the lot of them. Well done, boy. Hmph. Your sister had better be all right."],
 	]
-	nestor.stations = [["", Vector3(4, 1, 17)], ["b2.split", Vector3(1.5, 1, 7)]]
+	nestor.stations = [["", Vector3(4, 1, 17)], ["b2.split", Vector3(1.5, 1, 7)], ["b4.split", Vector3(10, 1, -8.6)], ["b4.nestor_free", Vector3(8, 1, -2)]]
 	nestor.on_used = _talk_nestor
 	place(nestor, "Nestor", Vector3(4, 1, 17))
 
@@ -226,7 +243,7 @@ func _build_house() -> void:
 	var rick := Npc.new()
 	rick.npc_name = "Rick"
 	rick.color = Color(0.85, 0.4, 0.2)
-	rick.present = "argo.rick_here & !b2.away"
+	rick.present = "argo.rick_here & !b2.away & !b4.away"
 	rick.lines = [
 		["argo.rick_here", "I'm Rick, Rick Banner. Everybody in Kilmore Cove talks about this house. They say Ulysses Moore used to go down the cliff path behind the garden."],
 		["item:parchment", "Those symbols... There's a huge old dictionary in your library. Julia, you're good at this sort of thing."],
@@ -236,6 +253,7 @@ func _build_house() -> void:
 		["item:owl_key", "Four keys, four locks. Let's try them!"],
 		["argo_door.fails", "Owl, Porcupine, Elephant, Newt... Hang on. Look at the first letters!"],
 		["argo_door.open", "It actually opened! Where do you think it goes?"],
+		["b3.escaped", "Venice... We need a plan. Let's meet in the attic: the stairs are by the front door."],
 	]
 	place(rick, "Rick", Vector3(2.2, 1, 5))
 
@@ -455,6 +473,111 @@ func _breakfast() -> void:
 	GameState.add_journal("map_memory", "What I remember of the map",
 		"I only held the map for about ten seconds, but I remember three little drawings on it:\n- right on the coast at the top of the map, something tall and thin with lines coming out of the top, like rays;\n- in the west of the village, a small sitting animal with pointed ears;\n- in the east, a big house with a lion's head drawn on its door.\nJulia should check them against something.", "jason")
 	Game.current.say("Book 3: The House of Mirrors. Over breakfast, the three of you compare everything. Rick: \"Something about Kilmore Cove doesn't add up.\"")
+
+
+# --- Book 4: intruders (Jason's half) -----------------------------------------------
+
+## Steps 4-6 (canon: two Venetians come through the open Door, tie up Nestor and
+## loot the house; Jason goes back alone to deal with them, LOW-MEDIUM). The
+## dog's patrol, the stashed loot and the mask are adaptation.
+func _build_intruders() -> void:
+	var stairs := LevelExit.new()
+	stairs.level = ATTIC
+	stairs.requires = "b3.escaped"
+	stairs.solo_when = "b4.split"
+	stairs.prompt = "Climb the attic stairs"
+	place(stairs, "AtticStairs", Vector3(-2.8, 1, 8.4))
+	add_label("attic stairs", Vector3(-3.6, 2.6, 8.4), 90).font_size = 28
+
+	var untie := Switch.new()
+	untie.who = "jason"
+	untie.flag = "b4.nestor_free"
+	untie.requires = "b4.split"
+	untie.prompt = "Untie Nestor"
+	place(untie, "UntieNestor", Vector3(10, 1, -7.6))
+
+	for item in LOOT:
+		var loot := Pickup.new()
+		loot.who = "jason"
+		loot.requires = "b4.nestor_free"
+		loot.appears = "b4.split"
+		loot.item_id = item[0]
+		loot.item_name = item[1]
+		loot.prompt = "Take back %s" % item[1]
+		loot.box_size = Vector3(0.5, 0.4, 0.4)
+		loot.color = Color(0.8, 0.75, 0.4)
+		loot.on_used = func(_p: Node3D) -> void: _check_argo_safe()
+		place(loot, "Loot_" + item[0], item[2])
+
+	var dog := Npc.new()
+	dog.npc_name = "Diogo (a dog)"
+	dog.color = Color(0.5, 0.4, 0.3)
+	dog.who = "nobody"
+	dog.present = "b4.split & !b4.intruders_gone"
+	dog.walk_speed = 3.0
+	var stations := [["", DOG_ROUTE[0]]]
+	for i in DOG_ROUTE.size():
+		stations.append(["b4.dog=%d" % i, DOG_ROUTE[i]])
+	dog.stations = stations
+	place(dog, "Dog", DOG_ROUTE[0])
+
+	var npcs := [["DonDiego", "Don Diego Valente", Vector3(-1.2, 1, 9)], ["Dieguita", "Dieguita", Vector3(1.2, 1, 9)]]
+	for n in npcs:
+		var npc := Npc.new()
+		npc.npc_name = n[1]
+		npc.color = Color(0.45, 0.35, 0.25)
+		npc.who = "jason"
+		npc.present = "b4.split & !b4.intruders_gone"
+		npc.lines = [["", "Ha! A boy! Go away, boy, before the dog eats you."]]
+		npc.on_used = _scare_intruders
+		place(npc, n[0], n[2])
+
+	var masks := JournalNote.new()
+	masks.who = "jason"
+	masks.entry_who = "jason"
+	masks.requires = "b4.split"
+	masks.entry_id = "cenere_mask"
+	masks.title = "Masks of the Venetian secret guard"
+	masks.body = "In Ulysses's library, a book of old Venetian masks. The secret guard wore plain white masks... except their captains. One of them, Count Cenere, \"Count Ash\", wore one all of his own: ash-grey, with a single silver tear under the left eye.\nJulia needs to know this."
+	masks.prompt = "Leaf through a book of Venetian masks"
+	masks.size = Vector3(0.5, 0.1, 0.35)
+	place(masks, "MaskBook", Vector3(-8, 1.2, -5.8))
+
+
+## Step 5: the mask scares them off (Julia's tip, canon-ish: they fear the guard).
+func _scare_intruders(_player: Node3D) -> void:
+	if not GameState.has_item("guard_mask") or GameState.get_flag("b4.intruders_gone", false):
+		return
+	GameState.set_flag("b4.intruders_gone")
+	Game.current.say("Jason pulls on the white mask. Don Diego goes pale: \"La guardia!\" He, Dieguita and the dog bolt for the Door and are gone.", "jason")
+	Game.current.say("Two ragged figures and a dog come tumbling out of the Door passage, look over their shoulders in terror, and run off into the alleys.", "julia")
+	_check_argo_safe()
+
+
+func _check_argo_safe() -> void:
+	if GameState.get_flag("b4.argo_safe", false):
+		return
+	var all := LOOT.all(func(i: Array) -> bool: return GameState.has_item(i[0]))
+	if all and GameState.get_flag("b4.intruders_gone", false) and GameState.get_flag("b4.nestor_free", false):
+		GameState.set_flag("b4.argo_safe")
+		GameState.add_journal("argo_safe", "The house is ours again",
+			"Nestor's free, the telescope, the candlesticks and Mum's jewellery box are back, and Don Diego, Dieguita and their dog ran back through the Door the moment they saw the guard's mask.", "jason")
+
+
+## Host: the dog's patrol and what it sees.
+func _run_intruders(delta: float) -> void:
+	if not GameState.get_flag("b4.split", false) or GameState.get_flag("b4.intruders_gone", false) \
+			or Game.current.level_for("jason") != self:
+		return
+	_dog_t += delta
+	if _dog_t >= DOG_SECONDS:
+		_dog_t = 0.0
+		GameState.set_flag("b4.dog", (int(GameState.get_flag("b4.dog", 0)) + 1) % DOG_ROUTE.size())
+	var dog: Node3D = get_node("Dog")
+	var jason := Game.current.get_player(1)
+	if jason and sees(dog, jason, 5.0):
+		jason.teleport.rpc(to_global(Vector3(9, 1, -5)), PI / 2)
+		Game.current.say("Diogo barks his head off! Don Diego comes running, and Jason has to dive back into the stone sitting room.", "jason")
 
 
 # --- Book 2: the storm (Julia's half) ----------------------------------------------
