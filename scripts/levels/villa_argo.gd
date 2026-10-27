@@ -335,6 +335,14 @@ func _build_stone_room() -> void:
 	steps.prompt = "Go down the stone steps"
 	steps.gather_radius = 6.0
 	place(steps, "StepsDown", Vector3(14.5, 1, -5))
+	var to_beach := LevelExit.new()
+	to_beach.who = "jason"
+	to_beach.solo = true
+	to_beach.level = UNDERGROUND
+	to_beach.entry = "beach"
+	to_beach.requires = "b4.julia_home & !b4.home"
+	to_beach.prompt = "Run down to the beach"
+	place(to_beach, "RunToBeach", Vector3(13.8, 1, -3.6))
 
 
 # --- Tower ----------------------------------------------------------------------

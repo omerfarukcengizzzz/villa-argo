@@ -6,16 +6,23 @@ extends Level
 ## the twins. Julia and Rick stay. Pass B, Julia's half (steps 8-11): the campo
 ## of masks where Count Cenere patrols, the Callers' print shop and the
 ## forbidden Encyclopedie, the lowercase "d", the flooded boat shed and the
-## hidden print room, and Penelope's house. Turtle Park onwards is Pass C.
+## hidden print room, and Penelope's house. Pass C (steps 12-14, 17): Turtle
+## Park and the pigeon at the well, the Master Watchmaker, the Black Gondolier
+## on the Fondamenta of the Masks (to the isle_of_masks level), and, after the
+## fire, the Metis home.
 ## No exact year or canal routes (ref §5).
 ##
 ## Map (north = -z): the mooring z 0..12 with the Metis to the south; the
 ## Door passage z -8..0 (Door on its west wall); the campo z -8..-34
 ## (x -20..20); north of it the Callers' print shop (x -6..6), the flooded boat
 ## shed (x 6..16) and the hidden print room (x 16..20); Penelope's house on
-## the west side (x -20..-10, z -24..-12).
+## the west side (x -20..-10, z -24..-12). East through a gap in the campo wall:
+## Turtle Park (x 20..42, z -8..-24), the Master Watchmaker's shop (x 34..42,
+## z -24..-32) and the Fondamenta of the Masks (z -34..-44).
 
 const VILLA_ARGO := "res://scenes/levels/villa_argo.tscn"
+const ISLE := "res://scenes/levels/isle_of_masks.tscn"
+const UNDERGROUND := "res://scenes/levels/argo_underground.tscn"
 const STONE := Color(0.7, 0.62, 0.55)
 ## Count Cenere's round of the campo, one leg every CENERE_SECONDS.
 const CENERE_ROUTE := [Vector3(-8, 1, -13), Vector3(10, 1, -13), Vector3(10, 1, -28), Vector3(-8, 1, -28)]
@@ -78,6 +85,7 @@ func _build() -> void:
 	_build_callers()
 	_build_print_room()
 	_build_penelope_house()
+	_build_east()
 	_build_rick()
 
 
@@ -127,7 +135,8 @@ func _build_campo() -> void:
 	add_box(Vector3(17, 4, 0.5), Vector3(-11.5, 2, -8), STONE)
 	add_box(Vector3(17, 4, 0.5), Vector3(11.5, 2, -8), STONE)
 	add_box(Vector3(0.5, 4, 36), Vector3(-20, 2, -26), STONE)
-	add_box(Vector3(0.5, 4, 36), Vector3(20, 2, -26), STONE)
+	add_box(Vector3(0.5, 4, 7), Vector3(20, 2, -11.5), STONE)
+	add_box(Vector3(0.5, 4, 25), Vector3(20, 2, -31.5), STONE)
 	add_box(Vector3(40, 4, 0.5), Vector3(0, 2, -44), STONE)
 	add_label("Campo Santa Marina", Vector3(0, 3.4, -8.3), 180)
 
@@ -334,6 +343,93 @@ func _build_penelope_house() -> void:
 	place(letters, "Letters", Vector3(-19, 1.0, -20.8))
 
 
+# --- East: Turtle Park, the Master Watchmaker, the Fondamenta (steps 12-14) ---
+
+func _build_east() -> void:
+	add_box(Vector3(22, 0.5, 36), Vector3(31, -0.25, -26), STONE)
+	add_box(Vector3(0.5, 4, 36), Vector3(42, 2, -26), STONE)
+	add_box(Vector3(22, 4, 0.5), Vector3(31, 2, -8), STONE)
+	add_box(Vector3(22, 4, 0.5), Vector3(31, 2, -44), STONE)
+	add_label("Turtle Park", Vector3(20.3, 3.2, -17), 90)
+
+	# Step 12 (chapter titles Turtle Park, The Well and the Pigeons; content
+	# adaptation): stone turtles, an old well, and a pigeon with a message.
+	for i in 3:
+		add_box(Vector3(1.2, 0.5, 1.6), Vector3(25 + i * 3, 0.25, -12), Color(0.5, 0.55, 0.45))
+	add_label("stone turtles", Vector3(28, 1.2, -12)).billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	add_box(Vector3(2, 1, 2), Vector3(32, 0.5, -18), Color(0.55, 0.5, 0.45))
+	add_label("an old well, pigeons on its rim", Vector3(32, 1.8, -18)).billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	var pigeon := JournalNote.new()
+	pigeon.who = "julia"
+	pigeon.requires = "b4.penelope"
+	pigeon.entry_id = "pigeon_message"
+	pigeon.title = "A pigeon at the well"
+	pigeon.body = "One fat grey pigeon at the old well is too tame: it hops onto Julia's hand. There's a little brass ring on its leg with a rolled-up note, in a spidery hand with that same curling d:\n\"To the Master Watchmaker: wind nothing for anyone but me. P. D.\"\nThe Master Watchmaker knows where Peter is."
+	pigeon.prompt = "Hold out a hand to the pigeons"
+	pigeon.size = Vector3(0.01, 0.01, 0.01)
+	place(pigeon, "Pigeon", Vector3(32, 1, -16.6))
+
+	# Step 13: the Master Watchmaker (chapter title; content adaptation).
+	var shop := Color(0.55, 0.5, 0.6)
+	add_box(Vector3(8, 4, 0.5), Vector3(38, 2, -24), shop)
+	add_box(Vector3(8, 4, 0.5), Vector3(38, 2, -32), shop)
+	add_box(Vector3(0.5, 4, 3), Vector3(34, 2, -25.5), shop)
+	add_box(Vector3(0.5, 4, 3), Vector3(34, 2, -30.5), shop)
+	add_label("MASTER WATCHMAKER", Vector3(33.7, 3.4, -28), -90).font_size = 28
+	var master := Npc.new()
+	master.npc_name = "The Master Watchmaker"
+	master.color = Color(0.5, 0.45, 0.55)
+	master.present = "b4.split"
+	master.lines = [
+		["", "Clocks, watches, automata. Look, don't touch."],
+		["journal:pigeon_message", "His pigeon came to you? Then he'd want you to know. I can't tell you where my master is: I truly don't know. Only one man does: the Black Gondolier. He waits by the last lamp on the Fondamenta of the Masks, and he rows for nobody without the word."],
+	]
+	master.on_used = func(_p: Node3D) -> void:
+		if GameState.has_journal("pigeon_message"):
+			GameState.set_flag("b4.watchmaker")
+	place(master, "MasterWatchmaker", Vector3(39, 1, -28))
+
+	# Step 14: the Black Gondolier (canon, HIGH) and the word from the Old Owl.
+	for x in [24.0, 30.0, 36.0, 40.5]:
+		add_box(Vector3(0.2, 3, 0.2), Vector3(x, 1.5, -41), Color(0.2, 0.2, 0.22))
+	add_label("the last lamp", Vector3(40.5, 3.4, -41)).billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	add_label("Fondamenta of the Masks", Vector3(31, 3.2, -43.7), 0).font_size = 32
+	add_box(Vector3(5, 0.6, 1.4), Vector3(38, -0.1, -43), Color(0.08, 0.08, 0.1))
+	var gondolier := Npc.new()
+	gondolier.npc_name = "The Black Gondolier"
+	gondolier.color = Color(0.1, 0.1, 0.12)
+	gondolier.present = "b4.split"
+	gondolier.lines = [["", "..."], ["b4.watchmaker", "...(He waits. He's listening for a word.)"]]
+	place(gondolier, "Gondolier", Vector3(40.5, 1, -42.5))
+	var word := CodeEntry.new()
+	word.who = "julia"
+	word.requires = "b4.watchmaker"
+	word.answer = "SERENISSIMA"
+	word.solved_flag = "b4.gondolier"
+	word.prompt = "Say the word to the Gondolier"
+	word.question = "The word:"
+	word.wrong_text = "The Black Gondolier doesn't move."
+	word.size = Vector3(0.01, 0.01, 0.01)
+	word.on_used = func(_p: Node3D) -> void:
+		Game.current.move_twin("julia", ISLE)
+		Game.current.say("\"Serenissima.\" The Black Gondolier bows, and rows Julia and Rick out across the dark lagoon to a little island hung with masks.", "julia")
+	place(word, "SayWord", Vector3(39.4, 1, -41.6))
+
+	# Step 17: home on the Metis, after the fire.
+	var home := LevelExit.new()
+	home.who = "julia"
+	home.solo = true
+	home.level = UNDERGROUND
+	home.entry = "beach"
+	home.requires = "b4.isle_escaped & b4.split"
+	home.prompt = "Sail home on the Metis"
+	home.on_used = func(_p: Node3D) -> void:
+		GameState.set_flag("b4.julia_home")
+		Game.current.say("The Metis glides out of the mist into the sea cave under Villa Argo, Julia and Rick on board.", "julia")
+		Game.current.say("A voice echoes up from under the house... The Metis is back! Run down to the beach.", "jason")
+	place(home, "SailHome", Vector3(-1, 1, 10.5))
+
+
 func _build_rick() -> void:
 	var rick := Npc.new()
 	rick.npc_name = "Rick"
@@ -345,6 +441,9 @@ func _build_rick() -> void:
 		["journal:encyclopedie", Vector3(1.5, 1, -37)],
 		["venice.printroom", Vector3(17.5, 1, -38)],
 		["venice.penelope_key", Vector3(-12, 1, -18)],
+		["b4.penelope", Vector3(28, 1, -16)],
+		["b4.watchmaker", Vector3(37, 1, -39)],
+		["b4.isle_escaped", Vector3(1, 1, 9)],
 	]
 	rick.lines = [
 		["", "Venice! Two hundred years ago, by the look of it. Look at all those masks."],
@@ -353,5 +452,8 @@ func _build_rick() -> void:
 		["journal:encyclopedie", "Look at the d on the Old Owl's slip: the stem curls right back over the bowl. Compare it with their type trays, Julia. You've got the sharper eyes."],
 		["venice.printroom", "These gears... I'd know them anywhere. Same as the House of Mirrors. Dedalus built this press! And Alberto mentioned someone called Penelope..."],
 		["b4.penelope", "Penelope Moore was born here. Two hundred years ago. And \"Peter\" feeds the pigeons in a park with turtles. Peter Dedalus!"],
+		["journal:pigeon_message", "The Master Watchmaker! His shop's on the far side of the park."],
+		["b4.watchmaker", "The Black Gondolier needs a word. Julia, did Jason find anything at home? Ask him!"],
+		["b4.isle_escaped", "Black Vulcano... Let's go home and tell Jason. The Metis is waiting."],
 	]
 	place(rick, "Rick", Vector3(2, 1, 8))

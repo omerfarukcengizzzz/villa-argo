@@ -29,6 +29,7 @@ func _build() -> void:
 	entries = {
 		"default": {"jason": Vector3(-0.6, 1, 10), "julia": Vector3(0.6, 1, 10)},
 		"round_room": {"jason": Vector3(-0.8, 1, 2), "julia": Vector3(0.8, 1, 2)},
+		"beach": {"jason": Vector3(-1.5, -15, -40), "julia": Vector3(1.5, -15, -46)},
 	}
 	fall_y = -25.0
 	add_environment(Color(0.0, 0.0, 0.0))
@@ -62,6 +63,8 @@ func _on_state_changed(_key: String) -> void:
 
 
 func _physics_process(_delta: float) -> void:
+	if multiplayer.is_server():
+		_check_reunion()
 	if not multiplayer.is_server() or GameState.get_flag("under.candle_out", false):
 		return
 	for p in Game.current.get_players():
@@ -262,6 +265,25 @@ func _build_cave() -> void:
 		Game.current.change_level(VENICE)
 		Game.current.say("The helm shudders, the mist closes in... and opens on a lagoon full of bells: Venice.")
 	place(to_venice, "HelmVenice", Vector3(0, deck_y + 1.2, -52))
+
+
+## Book 4 step 17 (canon chapter "Ritorni a casa", HIGH): Julia and Rick come
+## home on the Metis; once Jason is down on the beach too, the twins are back
+## together.
+func _check_reunion() -> void:
+	if not GameState.get_flag("b4.julia_home", false) or GameState.get_flag("b4.home", false):
+		return
+	if Game.current.level_for("jason") != self or Game.current.level_for("julia") != self:
+		return
+	for f in ["b4.split", "b4.away"]:
+		GameState.set_flag(f, false)
+	GameState.set_flag("b4.home")
+	Game.current.say("Jason comes skidding down onto the beach as the Metis bumps against the sand. Julia and Rick jump down. Everyone talks at once.")
+	GameState.add_journal("b4_home", "Home from Venice",
+		"Together again on the beach under Villa Argo. Jason dealt with Don Diego and Dieguita and their dog, and the Old Owl gave him the Black Gondolier's word. Julia and Rick found the Callers' secret press, Penelope's house, and Peter Dedalus on the Isle of Masks.
+Penelope Moore was born in Venice. Oblivia and Dedalus were close once. And Dedalus says Black Vulcano has all the keys, even the First.
+So: who is Black Vulcano, and where is he?")
+	Game.current.say_later("End of book 4: The Isle of Masks. (Book 5, The Stone Guardians, comes next.)", 5.0)
 
 
 ## End of book 1: the Metis sails, and book 2 starts in Punt.
