@@ -1,6 +1,6 @@
 extends CharacterBody3D
 ## Twin player. The owning peer simulates movement and replicates position/yaw
-## to the other peer. Only the owner gets a camera and input.
+## to the other peer. Only the owner gets a camera, input and interaction.
 
 const COLORS := {"jason": Color(0.25, 0.5, 0.9), "julia": Color(0.95, 0.55, 0.2)}
 const GRAVITY := 20.0
@@ -69,14 +69,23 @@ func _build_camera() -> void:
 	_camera = Camera3D.new()
 	_camera.position = Vector3(0, 0.8, 4.5)
 	_pivot.add_child(_camera)
-	# Render layer 2 holds Julia's private clues; Jason's camera must not draw it.
-	if role == "jason":
-		_camera.set_cull_mask_value(2, false)
+	# Each twin's camera skips the other twin's private render layer.
+	_camera.set_cull_mask_value(Vis.hidden_layer_for(role), false)
 	_camera.make_current()
 
 
+## Host-only call; used when moving between levels.
+@rpc("any_peer", "call_local", "reliable")
+func teleport(pos: Vector3, yaw: float) -> void:
+	if multiplayer.get_remote_sender_id() != 1:
+		return
+	position = pos
+	rotation.y = yaw
+	velocity = Vector3.ZERO
+
+
 func _unhandled_input(event: InputEvent) -> void:
-	if not is_multiplayer_authority():
+	if not is_multiplayer_authority() or Game.current.input_blocked:
 		return
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		_look(-event.relative.x * MOUSE_SENS, -event.relative.y * MOUSE_SENS)
@@ -94,18 +103,39 @@ func _look(yaw: float, pitch: float) -> void:
 func _physics_process(delta: float) -> void:
 	if not is_multiplayer_authority():
 		return
+	var active := not Game.current.input_blocked
 
 	var stick := Input.get_vector("look_left", "look_right", "look_up", "look_down")
-	if stick != Vector2.ZERO:
+	if active and stick != Vector2.ZERO:
 		_look(-stick.x * STICK_LOOK_SPEED * delta, -stick.y * STICK_LOOK_SPEED * delta)
 
 	if not is_on_floor():
 		velocity.y -= GRAVITY * delta
-	elif Input.is_action_just_pressed("jump"):
+	elif active and Input.is_action_just_pressed("jump"):
 		velocity.y = jump_velocity
 
-	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
+	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back") if active else Vector2.ZERO
 	var dir := (transform.basis * Vector3(input.x, 0, input.y)).normalized()
 	velocity.x = dir.x * speed
 	velocity.z = dir.z * speed
 	move_and_slide()
+
+	_update_focus(active)
+
+
+## Shows a prompt for the nearest interactable this twin may use, and asks the
+## host to use it on interact.
+func _update_focus(active: bool) -> void:
+	var best: Interactable = null
+	var best_d := INF
+	for node in get_tree().get_nodes_in_group("interactables"):
+		var it := node as Interactable
+		if not it.allows(role) or not it.is_available():
+			continue
+		var d := global_position.distance_to(it.global_position)
+		if d <= it.reach and d < best_d:
+			best = it
+			best_d = d
+	Game.current.show_prompt("[E] / (X) " + best.prompt if best and active else "")
+	if best and active and Input.is_action_just_pressed("interact"):
+		best.request()

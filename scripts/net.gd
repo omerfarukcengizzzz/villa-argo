@@ -34,6 +34,11 @@ func disconnect_from_game() -> void:
 	multiplayer.multiplayer_peer = null
 
 
+## This peer's twin. Host is always Jason.
+func my_role() -> String:
+	return "jason" if multiplayer.is_server() else "julia"
+
+
 func _register_input() -> void:
 	_add_action("move_forward", KEY_W, JOY_AXIS_LEFT_Y, -1.0)
 	_add_action("move_back", KEY_S, JOY_AXIS_LEFT_Y, 1.0)
@@ -53,6 +58,11 @@ func _register_input() -> void:
 	var interact_pad := InputEventJoypadButton.new()
 	interact_pad.button_index = JOY_BUTTON_X
 	InputMap.action_add_event("interact", interact_pad)
+
+	_add_action("journal", KEY_J)
+	var journal_pad := InputEventJoypadButton.new()
+	journal_pad.button_index = JOY_BUTTON_BACK
+	InputMap.action_add_event("journal", journal_pad)
 
 
 func _add_action(action: String, key: Key, axis: JoyAxis = JOY_AXIS_INVALID, axis_value := 0.0) -> void:
