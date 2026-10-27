@@ -7,6 +7,8 @@ extends Interactable
 ## label)`. No mesh of its own: the level draws whatever it stands for.
 
 var question := ""
+## Optional: builds the question on the asking peer (when it changes with state).
+var question_for := Callable()
 var options_for := Callable()
 var on_choice := Callable()
 
@@ -17,7 +19,7 @@ func _init() -> void:
 
 
 func request() -> void:
-	Game.current.ask_choice(question, options_for.call(), submit)
+	Game.current.ask_choice(question_for.call() if question_for.is_valid() else question, options_for.call(), submit)
 
 
 func submit(choice: String) -> void:

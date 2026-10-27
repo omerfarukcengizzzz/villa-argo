@@ -131,6 +131,9 @@ func _talk_nestor(_player: Node3D) -> void:
 	if GameState.get_flag("b2.home", false) and not GameState.get_flag("b3.started", false):
 		_breakfast()
 		return
+	if GameState.get_flag("b4.home", false) and not GameState.get_flag("b5.started", false):
+		_start_book5()
+		return
 	if GameState.get_flag("argo.met_nestor", false):
 		return
 	GameState.set_flag("argo.met_nestor")
@@ -186,6 +189,8 @@ func _build_courtyard() -> void:
 		["b4.split", "Mmmf! Mmmmf!"],
 		["b4.nestor_free", "A man, a girl and a mangy dog, out of that door! They tied me up and went through the house like locusts: the tower, the library, the garden. Mind the dog. It barks at anything that moves."],
 		["b4.argo_safe", "Gone, the lot of them. Well done, boy. Hmph. Your sister had better be all right."],
+		["b4.home", "Black Vulcano? Hmph. Drove the trains, years ago, when there were trains. Now get some sleep: it's school tomorrow, and your parents have written to the headteacher."],
+		["b5.started", "School. Go. And don't bring anything home I'll have to explain."],
 	]
 	nestor.stations = [["", Vector3(4, 1, 17)], ["b2.split", Vector3(1.5, 1, 7)], ["b4.split", Vector3(10, 1, -8.6)], ["b4.nestor_free", Vector3(8, 1, -2)]]
 	nestor.on_used = _talk_nestor
@@ -465,6 +470,16 @@ func _add_cracked_ledge(top: Vector3, color: Color) -> void:
 		crack.rotation_degrees.y = angle
 		Vis.make_private(crack, "julia")
 		add_child(crack)
+
+
+# --- Book 5: the new goal -----------------------------------------------------------
+
+## Book 5 step 1 (canon ✅): find Black Vulcano before Oblivia does.
+func _start_book5() -> void:
+	GameState.set_flag("b5.started")
+	GameState.add_journal("b5_goal", "Find Black Vulcano",
+		"Dedalus says Black Vulcano has all the keys, even the First. Nestor says he drove the trains in Kilmore Cove, years ago, when there were trains. Oblivia and Manfred will be looking for him too.\nBut first: school. Our parents have written to the headteacher.")
+	Game.current.say("Book 5: The Stone Guardians. Tomorrow is school, in Kilmore Cove, and the headteacher has been told to keep an eye on the Covenant twins.")
 
 
 # --- Book 3: breakfast -------------------------------------------------------------

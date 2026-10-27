@@ -1,6 +1,6 @@
 # Book 5 design: *The Stone Guardians* (Clark Beamish Station and the Garden)
 
-Draft for approval. Same conventions as books 1–4: every step cites the story reference (`docs/ulysses-moore-books-1-6-reference.md`, "ref") and is marked **canon** or **adaptation**.
+Approved (decisions at the end). Status: Pass A (steps 1–5) done; level `school` (origin x 21000), the rest in `villa_argo` and `kilmore_cove`; test `tests/book5_pass_a.gd`. Same conventions as books 1–4: every step cites the story reference (`docs/ulysses-moore-books-1-6-reference.md`, "ref") and is marked **canon** or **adaptation**.
 
 Book 5 follows the lead from book 4: **find Black Vulcano**, believed to hold the First Key, before Oblivia and Manfred do (ref B5 scene 1, HIGH ✅). It moves from school trouble in Kilmore Cove to the abandoned **Clark Beamish Station**, the best-described place in the whole reference (the overgrown hall, the 1936 perpetual timetable, the moving bookstand, Dedalus's ticket printer, the control room with red levers and red and blue valves; ref §5, HIGH), and ends with the twins arriving in the medieval **Garden of Prester John** (ref B5 scenes 10–11).
 
@@ -72,9 +72,9 @@ Book 5 ends with the twins in the Garden (canon). Book 6 continues there.
 2. **Pass B:** Clark Beamish Station: Fred, the hall, the ticket office, the printer, the control room, the riddle and the train (steps 6–11).
 3. **Pass C:** to the Garden: Oblivia ahead, the Metis, the stone guardians, the corridor of death, the cloister (steps 12–13).
 
-## Open choices
+## Decisions
 
-1. **School as a playable level** (sneaking out, covering for each other), or skip school and start at the lighthouse?
-2. **Rick stays behind** at the end (to set up book 6's split, where Rick is in Kilmore Cove while the twins are in the Garden). OK?
-3. The **stone guardians** that move only when nobody's watching them (each twin can watch only one). Fun, or too much like a horror game for this?
-4. Black Vulcano himself doesn't appear in book 5 (canon: he's in the Garden in book 6). OK to keep him offstage until then?
+1. School is a playable level.
+2. Rick stays behind at the end of book 5.
+3. Stone guardians that move only when unwatched: yes.
+4. Black Vulcano stays offstage until book 6.

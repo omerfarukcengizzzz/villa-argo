@@ -137,7 +137,7 @@ func sees(watcher: Node3D, target: Node3D, radius: float, fov_degrees := 120.0) 
 		return true
 	var forward := -watcher.global_transform.basis.z
 	forward.y = 0.0
-	if rad_to_deg(forward.normalized().angle_to(to.normalized())) > fov_degrees / 2.0:
+	if fov_degrees < 360.0 and rad_to_deg(forward.normalized().angle_to(to.normalized())) > fov_degrees / 2.0:
 		return false
 	var ray := PhysicsRayQueryParameters3D.create(watcher.global_position + Vector3.UP * 0.5, target.global_position + Vector3.UP * 0.5)
 	for p in Game.current.get_players():

@@ -15,6 +15,10 @@ extends Level
 
 const VILLA_ARGO := "res://scenes/levels/villa_argo.tscn"
 const MIRROR_HOUSE := "res://scenes/levels/mirror_house.tscn"
+const SCHOOL := "res://scenes/levels/school.tscn"
+## Book 5 step 4: Dad's walk across the square, one stop every DAD_SECONDS.
+const DAD_ROUTE := [Vector3(-12, 1, 3), Vector3(-22, 1, 3), Vector3(-32, 1, 0), Vector3(-32, 1, -14), Vector3(-22, 1, -15)]
+const DAD_SECONDS := 4.0
 const WALL := Color(0.75, 0.68, 0.6)
 const ROAD := Color(0.5, 0.5, 0.5)
 
@@ -30,12 +34,15 @@ const GUIDE := "AN ILLUSTRATED GUIDE TO KILMORE COVE (price sixpence)\n\n1. The 
 const MARKS := "368"
 
 var _ruins: Node3D
+var _dad_t := 0.0
+var _hid_t := 0.0
 
 
 func _build() -> void:
 	entries = {
 		"default": {"jason": Vector3(-1.2, 1, 8), "julia": Vector3(1.2, 1, 8), "yaw": 0.0},
 		"mirror_house": {"jason": Vector3(32, 1, -13.5), "julia": Vector3(34, 1, -13.5), "yaw": PI},
+		"school": {"jason": Vector3(-24, 1, 11.5), "julia": Vector3(-22, 1, 11.5), "yaw": PI},
 	}
 	add_environment(Color(0.6, 0.72, 0.85))
 
@@ -50,6 +57,7 @@ func _build() -> void:
 	_build_lighthouse()
 	_build_railway()
 	_build_mirror_house()
+	_build_school_town()
 	_build_rick()
 
 
@@ -250,9 +258,110 @@ func _build_lighthouse() -> void:
 		["journal:three_marks", "Ulysses sent you, did he? No... he couldn't have. Hmph. Yes, I knew him. And Peter Dedalus: the best watchmaker this coast ever had. His house is full of tricks. Mind you don't believe everything you see in there."],
 		["b3.escaped", "Bulldozers, on Peter's house! That woman will answer for it. Venice, you say? Then she's gone after him."],
 	]
-	minaxo.stations = [["", Vector3(-30, 1, -30.8)], ["b3.escaped", Vector3(36, 1, -12)]]
-	minaxo.on_used = func(_p: Node3D) -> void: _met("b3.met_minaxo")
+	minaxo.stations = [["", Vector3(-30, 1, -30.8)], ["b3.escaped", Vector3(36, 1, -12)], ["b5.started", Vector3(-30, 1, -30.8)]]
+	minaxo.lines.append(["b5.jason_out", "You should be at school, boy. ...Black Vulcano. Hmph. Sit down, then. I'll tell you once."])
+	minaxo.lines.append(["b5.met_minaxo", "Clark Beamish Station. Fred has the keys. Now get back to school before somebody sees you."])
+	minaxo.on_used = func(_p: Node3D) -> void:
+		_met("b3.met_minaxo")
+		if GameState.get_flag("b5.jason_out", false) and not GameState.get_flag("b5.met_minaxo", false):
+			_great_summer()
 	place(minaxo, "Minaxo", Vector3(-30, 1, -30.8))
+
+
+# --- Book 5: school trouble (steps 2-4) -------------------------------------------
+
+## Step 3 (canon: Jason sneaks to the lighthouse; the 1958 group, MEDIUM; exact
+## members LOW, so only ones the twins know of are named).
+func _great_summer() -> void:
+	GameState.set_flag("b5.met_minaxo")
+	GameState.add_journal("great_summer", "The Great Summer of 1958",
+		"Minaxo told me, grudgingly. In the summer of 1958 a group of friends from Kilmore Cove found the Doors: Ulysses Moore, Peter Dedalus, Black Vulcano, Clio Biggles, Leonard Minaxo himself, and others he wouldn't name. They swore to keep the Doors secret and safe. They called themselves the Imaginary Travellers.\nBlack Vulcano ran the trains at Clark Beamish Station, before it was shut. Only Fred at the town hall has the keys to it now.")
+	await get_tree().create_timer(2.0).timeout
+	GameState.set_flag("b5.dad", 0)
+	GameState.set_flag("b5.dad_walk")
+	Game.current.say("Walking back past the square... that's Dad! What's he doing in Kilmore Cove? If he sees you, you're done for. Chubber's pastry shop, quick!", "jason")
+
+
+func _build_school_town() -> void:
+	# The school, on the south side of the square.
+	add_box(Vector3(12, 5, 3), Vector3(-23, 2.5, 15), Color(0.7, 0.6, 0.5))
+	add_label("KILMORE COVE SCHOOL", Vector3(-23, 4.4, 13.4), 180)
+	var door := LevelExit.new()
+	door.level = SCHOOL
+	door.requires = "b5.started & !b5.jason_out"
+	door.prompt = "Go into school"
+	place(door, "SchoolDoor", Vector3(-23, 1, 12.6))
+	add_box(Vector3(1.2, 0.8, 0.1), Vector3(-18.5, 3.0, 13.45), Color(0.6, 0.75, 0.85))
+	add_label("restroom window", Vector3(-18.5, 3.7, 13.4), 180).font_size = 22
+	add_climb_wall(Vector3(1.4, 2.5, 0.6), Vector3(-18.5, 1.25, 13.1))
+	var window := LevelExit.new()
+	window.who = "jason"
+	window.solo = true
+	window.level = SCHOOL
+	window.entry = "restroom"
+	window.requires = "b5.dad_gone & b5.jason_out"
+	window.prompt = "Climb in through the restroom window"
+	window.on_used = _caught
+	place(window, "RestroomWindow", Vector3(-18.5, 3.4, 12.6))
+
+	# Chubber's pastry shop, on the west side of the square (canon, MEDIUM).
+	var shop := Color(0.85, 0.65, 0.55)
+	add_box(Vector3(7, 4, 0.5), Vector3(-36.5, 2, -8), shop)
+	add_box(Vector3(7, 4, 0.5), Vector3(-36.5, 2, 0), shop)
+	add_box(Vector3(0.5, 4, 3), Vector3(-33, 2, -6.5), shop)
+	add_box(Vector3(0.5, 4, 3), Vector3(-33, 2, -1.5), shop)
+	add_label("CHUBBER'S PASTRIES", Vector3(-32.7, 3.5, -4), -90).font_size = 30
+	var hide := Switch.new()
+	hide.who = "jason"
+	hide.flag = "b5.hid"
+	hide.requires = "b5.dad_walk & !b5.dad_gone"
+	hide.prompt = "Duck behind the cake counter"
+	place(hide, "HideInChubbers", Vector3(-37, 1, -4))
+
+	var dad := Npc.new()
+	dad.npc_name = "Mr Covenant (Dad!)"
+	dad.color = Color(0.3, 0.4, 0.55)
+	dad.who = "nobody"
+	dad.present = "b5.dad_walk & !b5.dad_gone"
+	dad.walk_speed = 2.5
+	var stations := [["", DAD_ROUTE[0]]]
+	for i in DAD_ROUTE.size():
+		stations.append(["b5.dad=%d" % i, DAD_ROUTE[i]])
+	dad.stations = stations
+	place(dad, "Dad", DAD_ROUTE[0])
+
+
+func _physics_process(delta: float) -> void:
+	if not multiplayer.is_server() or not GameState.get_flag("b5.dad_walk", false) or GameState.get_flag("b5.dad_gone", false):
+		return
+	var jason := Game.current.get_player(1)
+	if jason == null or Game.current.level_for("jason") != self:
+		return
+	if GameState.get_flag("b5.hid", false):
+		_hid_t += delta
+		if _hid_t > 6.0:
+			GameState.set_flag("b5.dad_gone")
+			Game.current.say("Through the shop window you watch Dad stroll past, buy a newspaper and wander off. Phew. Now: back into school, through the restroom window.", "jason")
+		return
+	_dad_t += delta
+	if _dad_t >= DAD_SECONDS:
+		_dad_t = 0.0
+		GameState.set_flag("b5.dad", (int(GameState.get_flag("b5.dad", 0)) + 1) % DAD_ROUTE.size())
+	if sees(get_node("Dad"), jason, 7.0):
+		jason.teleport.rpc(to_global(Vector3(-30, 1, -29)), 0.0)
+		Game.current.say("\"Jason?\" You dive behind a wall just in time and run back toward the lighthouse. Did he see you? Try again: Chubber's pastry shop, on the west side of the square.", "jason")
+
+
+## Step 4 (canon, MEDIUM): caught, and the headteacher confiscates the keys,
+## the half-burned photo and the Egyptian charm.
+func _caught(_player: Node3D) -> void:
+	GameState.set_flag("b5.jason_out", false)
+	GameState.set_flag("b5.confiscated")
+	for k in ["owl_key", "porcupine_key", "elephant_key", "newt_key"]:
+		GameState.take_item(k)
+	GameState.add_journal("confiscated", "Confiscated",
+		"Jason climbed back in through the restroom window... straight into the headteacher. He turned out Jason's pockets on the spot: the four keys from Villa Argo, the half-burned photograph from the Isle of Masks, and the little Egyptian charm from Punt. \"You'll have these back at the end of term, Mr Covenant.\" They're locked in his office.\nWithout the keys, we can't open the Door.")
+	Game.current.say("Jason drops in through the restroom window, right at the headteacher's feet. \"Empty your pockets, Mr Covenant.\"")
 
 
 func _build_railway() -> void:
