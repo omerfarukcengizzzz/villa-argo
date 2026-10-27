@@ -17,6 +17,7 @@ extends Level
 ## gate and gatehouse at z -24; the corridor x -3..3, z -24..-50; the cloister
 ## x -12..12, z -50..-72.
 
+const MAZE_TOWN := "res://scenes/levels/maze_town.tscn"
 const STONE := Color(0.6, 0.58, 0.52)
 const FLAG := Color(0.55, 0.52, 0.47)
 const GRASS := Color(0.35, 0.5, 0.3)
@@ -35,6 +36,7 @@ const WATCH_RANGE := 30.0
 const FALSE_STONES := [[true, false, true], [false, true, true], [true, true, false], [true, false, true], [false, true, true]]
 
 var _step_t := 0.0
+var _b6_t := 0.0
 
 
 func _init() -> void:
@@ -193,7 +195,7 @@ func _reset_guardians() -> void:
 func _physics_process(delta: float) -> void:
 	if not multiplayer.is_server():
 		return
-	_check_cloister()
+	_check_cloister(delta)
 	if GameState.get_flag("garden.gate_open", false):
 		return
 	var twins := Game.current.get_players().filter(func(p: Node3D) -> bool: return Game.current.level_for(p.role) == self)
@@ -308,13 +310,26 @@ func _build_cloister() -> void:
 		npc.npc_name = who[0]
 		npc.color = who[1]
 		npc.who = "nobody"
-		npc.present = "b5.cloister"
+		npc.present = "b5.cloister & !b6.started"
 		place(npc, who[0].split(" ")[0], who[2])
+
+	# Book 6 step 1: the small door Oblivia and Manfred slipped out through.
+	add_box(Vector3(1.6, 2.6, 0.2), Vector3(0, 1.3, -71.7), Color(0.35, 0.25, 0.15))
+	var door := LevelExit.new()
+	door.level = MAZE_TOWN
+	door.requires = "b6.started"
+	door.prompt = "Go through the small door"
+	place(door, "CloisterDoor", Vector3(0, 1, -70.6))
 
 
 ## Host: both twins in the cloister: the gate slams behind them. End of book 5.
-func _check_cloister() -> void:
+## A little later, book 6 starts there.
+func _check_cloister(delta: float) -> void:
 	if GameState.get_flag("b5.cloister", false):
+		if not GameState.get_flag("b6.started", false):
+			_b6_t += delta
+			if _b6_t > 9.0:
+				_start_book6()
 		return
 	var twins := Game.current.get_players()
 	if twins.size() < 2 or not twins.all(func(p: Node3D) -> bool:
@@ -325,3 +340,12 @@ func _check_cloister() -> void:
 		"Past the corridor of death, a quiet cloister: columns, a square of grass, a well. The iron gate slammed down behind us, and there's no handle on this side.\nAnd on the far side of the cloister, two figures we know: Oblivia Newton, and Manfred. They've seen us too.\nWe're inside the Garden of Prester John. Black Vulcano must be somewhere in here. So is the way home, we hope.")
 	Game.current.say("CLANG! An iron gate drops behind you. And across the cloister, turning to stare: Oblivia Newton and Manfred.")
 	Game.current.say_later("End of book 5: The Stone Guardians. (Book 6 continues in the Garden.)", 5.0)
+
+
+## Book 6 step 1 (canon: the twins trapped in the Garden with Oblivia and
+## Manfred, HIGH; the small door is adaptation).
+func _start_book6() -> void:
+	GameState.set_flag("b6.started")
+	GameState.add_journal("b6_start", "Trapped in the Garden",
+		"While we were staring at the gate, Oblivia and Manfred slipped away through a small door at the far end of the cloister. Beyond it there's a whole medieval town: roofs and towers and streets that twist back on themselves.\nRick is back in Kilmore Cove. Nobody knows where we are, except maybe Nestor. Black Vulcano is somewhere in here, and so is the way home.")
+	Game.current.say("Book 6: The First Key. When you look again, Oblivia and Manfred are gone, through a small door at the far end of the cloister.")

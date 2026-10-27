@@ -1,6 +1,6 @@
 # Book 6 design: *The First Key* (the Garden, and Nestor's secret)
 
-Draft for approval (open questions at the end). Same conventions as books 1–5: every step cites the story reference (`docs/ulysses-moore-books-1-6-reference.md`, "ref") and is marked **canon** or **adaptation**.
+Approved (decisions at the end). Status: Pass A (steps 1–3) done: book 6 starts in the `garden` cloister, level `maze_town` (origin x 30000); test `tests/book6_pass_a.gd`. Adaptation choices in Pass A: the maze (a grid of streets with one way through, plus a dead-end branch and a loop), Jason's watchtower by the town gate with the view and the portcullis winch, Julia caught on entering the bell-tower square and shut in a little room at the bottom of the tower. Same conventions as books 1–5: every step cites the story reference (`docs/ulysses-moore-books-1-6-reference.md`, "ref") and is marked **canon** or **adaptation**.
 
 Book 6 picks up where book 5 ends: the twins are shut in the medieval **Garden of Prester John** with Oblivia and Manfred, while **Rick is in Kilmore Cove** (ref B6 scene 1, HIGH). Rick **breaks into Nestor's cottage and finds out that Nestor is Ulysses Moore** (HIGH ✅), with an **old photograph** at the heart of it (HIGH ✅). He then goes to the Garden **through the station Door with Ulysses** (MEDIUM ✅). In the Garden: a labyrinthine medieval town (HIGH), Black Vulcano (MEDIUM), the **truth that nobody ever had the First Key** (MEDIUM), and a **Gordian knot** (MEDIUM, use unknown). It ends with Manfred running off to Punt with Gwendaline (✅), Julia and Rick together (MEDIUM), and the First Key, unknown to everyone, on **Fred's** key ring (MEDIUM ✅).
 
@@ -93,9 +93,9 @@ Technically the client keeps the `julia` role. While `b6.playing_rick` is set, t
 2. **Pass B:** the split: Rick in Kilmore Cove (cottage, photo, Ulysses, Minaxo, the train) and Jason in the Garden (guards, Black Vulcano, the knot) (steps 4–12).
 3. **Pass C:** the reunion, the Gordian knot, the truth, home, the epilogue (steps 13–16).
 
-## Open questions
+## Decisions
 
-1. **The split:** should Julia's player play Rick while Julia is held (recommended)? The alternatives are to keep Rick's storyline offstage and tell it in the journal (the twins stay together), or to have both players play Rick's chapter together, as Rick and Minaxo.
-2. **Zan-Zan and Phoenix Smith:** leave them out, since we know nothing about them (recommended)? Or give them a short unexplained cameo on the train?
-3. **Black Vulcano at the end:** he stays in the Garden (recommended, adaptation), or comes home with everyone?
-4. **Epilogue extras:** include Minaxo and Calypso getting together (LOW–MEDIUM), or leave it out (recommended: just one line hinting at it)?
+1. The split: yes. Julia's player plays Rick while Julia is held.
+2. Zan-Zan and Phoenix Smith are left out.
+3. Black Vulcano stays in the Garden at the end.
+4. Minaxo and Calypso get a full scene in the epilogue (LOW–MEDIUM, labelled as such).
