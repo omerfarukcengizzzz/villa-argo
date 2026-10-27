@@ -3,7 +3,9 @@ extends Interactable
 ## A character the twins can talk to (gray-box: a capsule with a name tag).
 ## `lines` is a list of [condition, text]; talking says the last line whose
 ## GameState condition holds, so later story states override earlier ones.
-## `present` is the condition for the character to be here at all.
+## `present` is the condition for the character to be here at all, and
+## `stations` ([condition, position] pairs, last match wins) moves them along
+## as the story goes on.
 ## Story effects of talking go in `on_used` (runs after the line is chosen).
 
 @export var npc_name := ""
@@ -11,6 +13,7 @@ extends Interactable
 @export var present := ""
 
 var lines: Array = []
+var stations: Array = []
 
 
 func _init() -> void:
@@ -40,6 +43,9 @@ func _build() -> void:
 
 func refresh() -> void:
 	visible = GameState.check(present)
+	for station in stations:
+		if GameState.check(station[0]):
+			position = station[1]
 
 
 func current_line() -> String:

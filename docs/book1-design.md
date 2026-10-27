@@ -75,5 +75,6 @@ Each pass is tested with the two-instance headless test before it's pushed, and 
 
 ## Status
 
-- **Pass A done:** `scripts/levels/villa_argo.gd` and `scripts/levels/kilmore_cove.gd`. Parchment cipher answer: CAVE SHIP. The scarred Door opens onto a placeholder room until Pass B.
+- **Pass A done:** `scripts/levels/villa_argo.gd` and `scripts/levels/kilmore_cove.gd`. Parchment cipher answer: CAVE SHIP.
+- **Pass B done:** `scripts/levels/argo_underground.gd`. Round room exits SUN (the way in), MOON (right), FLAME and WAVE (loop back). Floor stones: 1 east, 2 west, 3 south, 4 east, set in the order 4, 3, 2, 1. The helm only sails with both twins aboard; it ends the chapter with a message until book 2 exists.
 - No sound yet: the footsteps are a Jason-only message until the art/audio pass.

@@ -33,6 +33,8 @@ var _ask: PanelContainer
 var _ask_label: Label
 var _ask_field: LineEdit
 var _ask_callback := Callable()
+var _choice: PanelContainer
+var _choice_box: VBoxContainer
 
 
 func _enter_tree() -> void:
@@ -84,6 +86,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.is_action_pressed("ui_cancel"):
 			_close_ask("")
 		return
+	if _choice.visible:
+		if event.is_action_pressed("ui_cancel"):
+			_close_choice()
+		return
 	if event.is_action_pressed("journal"):
 		_set_journal_open(not _journal.visible)
 	elif _journal.visible and event.is_action_pressed("ui_cancel"):
@@ -119,6 +125,44 @@ func ask_text(question: String, callback: Callable) -> void:
 	input_blocked = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_ask_field.grab_focus()
+
+
+## Opens a list of choices on this peer's screen. `options` are
+## [label, enabled] pairs; `callback` gets the chosen label.
+func ask_choice(question: String, options: Array, callback: Callable) -> void:
+	if _journal.visible or _ask.visible:
+		return
+	for child in _choice_box.get_children():
+		child.queue_free()
+	var label := Label.new()
+	label.text = question
+	_choice_box.add_child(label)
+	var first: Button = null
+	for option in options:
+		var b := Button.new()
+		b.text = option[0]
+		b.disabled = not option[1]
+		b.pressed.connect(func() -> void:
+			_close_choice()
+			callback.call(option[0]))
+		_choice_box.add_child(b)
+		if first == null and option[1]:
+			first = b
+	var cancel := Button.new()
+	cancel.text = "Cancel (Esc)"
+	cancel.pressed.connect(_close_choice)
+	_choice_box.add_child(cancel)
+	_choice.visible = true
+	input_blocked = true
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	if first:
+		first.grab_focus.call_deferred()
+
+
+func _close_choice() -> void:
+	_choice.visible = false
+	input_blocked = false
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
 func _close_ask(text: String) -> void:
@@ -269,6 +313,15 @@ func _build_hud() -> void:
 	ok.pressed.connect(func() -> void: _close_ask(_ask_field.text))
 	box.add_child(ok)
 	layer.add_child(_ask)
+
+	_choice = PanelContainer.new()
+	_choice.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	_choice.custom_minimum_size = Vector2(420, 0)
+	_choice.position -= Vector2(210, 80)
+	_choice.visible = false
+	_choice_box = VBoxContainer.new()
+	_choice.add_child(_choice_box)
+	layer.add_child(_choice)
 
 	_journal = JournalUI.new()
 	_journal.visible = false

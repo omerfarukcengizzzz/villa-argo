@@ -49,6 +49,7 @@ func _submit(text: String) -> void:
 		_handle_answer(multiplayer.get_remote_sender_id(), text)
 
 
+## Host; override to add checks before the answer is compared.
 func _handle_answer(peer_id: int, text: String) -> void:
 	var player := _validate(peer_id)
 	if player == null:

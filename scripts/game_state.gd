@@ -35,7 +35,7 @@ func has_journal(id: String) -> bool:
 
 ## Condition strings used by levels and interactables: "" is always true,
 ## "flag" means the flag is truthy, "item:id" means the twins hold that item,
-## and a leading "!" negates either.
+## "journal:id" means that journal entry exists, and a leading "!" negates.
 func check(cond: String) -> bool:
 	if cond == "":
 		return true
@@ -43,6 +43,8 @@ func check(cond: String) -> bool:
 		return not check(cond.substr(1))
 	if cond.begins_with("item:"):
 		return has_item(cond.substr(5))
+	if cond.begins_with("journal:"):
+		return has_journal(cond.substr(8))
 	return bool(get_flag(cond, false))
 
 

@@ -2,7 +2,7 @@ extends Level
 ## Villa Argo, book 1 (docs/book1-design.md, steps 1-8): arrival and Nestor,
 ## footsteps in the tower at night, the cliff box, the parchment cipher, the
 ## wardrobe, the tower diary and the four-key door. The post office trip is
-## the kilmore_cove level. Behind the Door is Pass B (not built yet).
+## the kilmore_cove level. Behind the Door is the argo_underground level.
 ## Layout is adaptation (no canon floor plan); rooms and objects follow the
 ## story reference.
 ##
@@ -12,6 +12,7 @@ extends Level
 ## garden west, fenced at x = -21, with the cliff top and cliff path beyond.
 
 const KILMORE_COVE := "res://scenes/levels/kilmore_cove.tscn"
+const UNDERGROUND := "res://scenes/levels/argo_underground.tscn"
 const KEYS := ["owl_key", "porcupine_key", "elephant_key", "newt_key"]
 ## Parchment cipher (adaptation; the reference says the real alphabet is
 ## unknown). The parchment reads CAVE SHIP; the extra pairs are decoys.
@@ -30,6 +31,7 @@ func _build() -> void:
 	entries = {
 		"default": {"jason": Vector3(-1.5, 1, 22), "julia": Vector3(1.5, 1, 22)},
 		"gate": {"jason": Vector3(-1.5, 1, 23.5), "julia": Vector3(1.5, 1, 23.5)},
+		"door": {"jason": Vector3(10, 1, -6), "julia": Vector3(10, 1, -4), "yaw": PI / 2},
 	}
 	fall_y = -20.0
 	add_environment(Color(0.55, 0.7, 0.85))
@@ -255,16 +257,18 @@ func _build_stone_room() -> void:
 		lock.requires = "argo.wardrobe_moved"
 		place(lock, "Lock%d" % i, Vector3(11.75, 1.3, -5.6 + 0.4 * i))
 
-	# Behind the Door: Pass B (round room, dark stair, floor stones, the Metis).
-	add_box(Vector3(4, 0.5, 4), Vector3(14.25, -0.25, -5), Color(0.3, 0.3, 0.32))
-	add_box(Vector3(0.5, 4, 4), Vector3(16.25, 2, -5), w_dark())
-	add_box(Vector3(4, 4, 0.5), Vector3(14.25, 2, -7.25), w_dark())
-	add_box(Vector3(4, 4, 0.5), Vector3(14.25, 2, -2.75), w_dark())
-	add_label("Stone steps lead down into the dark...\n(to be continued)", Vector3(15.9, 2, -5), -90)
-
-
-func w_dark() -> Color:
-	return Color(0.25, 0.25, 0.28)
+	# Behind the Door: stone steps down to the argo_underground level.
+	var dark := Color(0.25, 0.25, 0.28)
+	add_box(Vector3(4, 0.5, 4), Vector3(14.25, -0.25, -5), dark)
+	add_box(Vector3(0.5, 4, 4), Vector3(16.25, 2, -5), dark)
+	add_box(Vector3(4, 4, 0.5), Vector3(14.25, 2, -7.25), dark)
+	add_box(Vector3(4, 4, 0.5), Vector3(14.25, 2, -2.75), dark)
+	var steps := LevelExit.new()
+	steps.level = UNDERGROUND
+	steps.requires = "argo_door.open"
+	steps.prompt = "Go down the stone steps"
+	steps.gather_radius = 6.0
+	place(steps, "StepsDown", Vector3(14.5, 1, -5))
 
 
 # --- Tower ----------------------------------------------------------------------
