@@ -97,6 +97,7 @@ func _build_street() -> void:
 	exit.level = VILLA_ARGO
 	exit.entry = "gate"
 	exit.prompt = "Cycle back up to Villa Argo"
+	exit.solo_when = "b6.playing_rick"
 	place(exit, "ExitToVilla", Vector3(0, 1, 12))
 
 
@@ -263,7 +264,12 @@ func _build_lighthouse() -> void:
 	minaxo.stations = [["", Vector3(-30, 1, -30.8)], ["b3.escaped", Vector3(36, 1, -12)], ["b5.started", Vector3(-30, 1, -30.8)]]
 	minaxo.lines.append(["b5.jason_out", "You should be at school, boy. ...Black Vulcano. Hmph. Sit down, then. I'll tell you once."])
 	minaxo.lines.append(["b5.met_minaxo", "Clark Beamish Station. Fred has the keys. Now get back to school before somebody sees you."])
+	minaxo.lines.append(["b6.met_ulysses", "He told you, did he? Then I'll tell you the rest. Sit down, lad."])
+	minaxo.lines.append(["b6.father", "Go on. Ulysses is waiting at the station. Bring those twins home."])
 	minaxo.on_used = func(_p: Node3D) -> void:
+		if GameState.get_flag("b6.met_ulysses", false) and not GameState.get_flag("b6.father", false):
+			_rick_father()
+			return
 		_met("b3.met_minaxo")
 		if GameState.get_flag("b5.jason_out", false) and not GameState.get_flag("b5.met_minaxo", false):
 			_great_summer()
@@ -282,6 +288,15 @@ func _great_summer() -> void:
 	GameState.set_flag("b5.dad", 0)
 	GameState.set_flag("b5.dad_walk")
 	Game.current.say("Walking back past the square... that's Dad! What's he doing in Kilmore Cove? If he sees you, you're done for. Chubber's pastry shop, quick!", "jason")
+
+
+## Book 6 step 8 (canon MEDIUM ✅: Rick's father died searching for the First
+## Key, with Minaxo). The scene is adaptation; for Rick (Julia's player) only.
+func _rick_father() -> void:
+	GameState.set_flag("b6.father")
+	GameState.add_journal("rick_father", "Rick: my father",
+		"Mr Minaxo looked at the sea for a long time before he said anything.\n\"Your father was my friend. Years after that summer, he and I went looking for the First Key, the one that opens every Door. We never found it. He didn't come back. I did. I should have told you a long time ago, lad. I'm sorry.\"\nNobody ever found the First Key. Not Dad, not Minaxo, not any of them.", "julia")
+	Game.current.say("Minaxo, quietly: \"Your father was my friend. We went looking for the First Key together, years ago. He didn't come back.\" Then: \"Go on. Ulysses is waiting at the station.\"", "julia")
 
 
 func _build_school_town() -> void:
@@ -420,6 +435,7 @@ func _build_town_hall() -> void:
 	door.level = STATION
 	door.requires = "b5.station_open"
 	door.prompt = "Go into the station"
+	door.solo_when = "b6.playing_rick"
 	place(door, "StationDoor", Vector3(22, 1, 3.8))
 
 
@@ -486,7 +502,7 @@ func _build_rick() -> void:
 	var rick := Npc.new()
 	rick.npc_name = "Rick"
 	rick.color = Color(0.85, 0.4, 0.2)
-	rick.present = "b3.started"
+	rick.present = "b3.started & !b6.playing_rick"
 	rick.walk_speed = 5.0
 	rick.stations = [
 		["", Vector3(2.5, 1, 6)],

@@ -32,6 +32,7 @@ const RIDDLE := "Words cut into the brass of the locomotive's cab, under the dus
 var _board: Node3D
 var _gauge: Label3D
 var _decay_t := 0.0
+var _boards: Array = []
 
 
 func _init() -> void:
@@ -55,6 +56,7 @@ func _build() -> void:
 	out.level = KILMORE_COVE
 	out.entry = "station"
 	out.prompt = "Back out to Kilmore Cove"
+	out.solo_when = "b6.playing_rick"
 	place(out, "LeaveStation", Vector3(0, 1, 9))
 
 
@@ -313,7 +315,14 @@ func _build_tunnel() -> void:
 	add_box(Vector3(8.4, 6, 0.4), Vector3(8, 3, -41.8), Color(0.4, 0.38, 0.35))
 	add_box(Vector3(2.4, 3.4, 0.3), Vector3(8, 1.7, -41.4), Color(0.35, 0.25, 0.15))
 	for y in [0.8, 1.8, 2.8]:
-		add_box(Vector3(3, 0.25, 0.1), Vector3(8, y, -41.2), Color(0.5, 0.4, 0.25)).rotation.z = 0.15
+		var board := add_box(Vector3(3, 0.25, 0.1), Vector3(8, y, -41.2), Color(0.5, 0.4, 0.25))
+		board.rotation.z = 0.15
+		_boards.append(board)
+	GameState.changed.connect(func(_k: String) -> void:
+		for b in _boards:
+			b.visible = not GameState.get_flag("b6.horse_open", false))
+	for b in _boards:
+		b.visible = not GameState.get_flag("b6.horse_open", false)
 	add_label("a door with a horse carved on it", Vector3(8, 4, -41.5)).font_size = 26
 	var door := JournalNote.new()
 	door.entry_id = "horse_door"
@@ -393,6 +402,7 @@ func _build_people() -> void:
 	rick.npc_name = "Rick"
 	rick.color = Color(0.85, 0.4, 0.2)
 	rick.walk_speed = 4.0
+	rick.present = "!b6.playing_rick"
 	rick.stations = [
 		["", Vector3(2.5, 1, 4)],
 		["station.bookstand", Vector3(-14.5, 1, -4)],
@@ -408,3 +418,33 @@ func _build_people() -> void:
 		["b5.train_awake", "It's alive! But look where the rails go: straight to that door. It's a Door, like yours. We'd need the Horse key... Let's get back to Argo and tell Nestor."],
 	]
 	place(rick, "Rick", Vector3(2.5, 1, 4))
+
+	# Book 6 step 9: Ulysses Moore and the Horse key (canon: Ulysses and Rick go
+	# through the station Door, MEDIUM ✅; the Horse key and the train ride are
+	# adaptation). For Rick (Julia's player) only.
+	var ulysses := Npc.new()
+	ulysses.npc_name = "Ulysses Moore"
+	ulysses.color = Color(0.45, 0.4, 0.3)
+	ulysses.present = "b6.father"
+	ulysses.lines = [
+		["b6.father", "Leonard told you. Good. Now: hold on to something."],
+		["b6.horse_open", "All aboard, Rick. Next stop, the Garden of Prester John."],
+	]
+	ulysses.on_used = func(_p: Node3D) -> void:
+		if GameState.get_flag("b6.horse_open", false):
+			return
+		GameState.set_flag("b6.horse_open")
+		GameState.add_journal("horse_key", "Rick: the Horse key",
+			"Ulysses took a key out of his waistcoat: old iron, with a horse's head. \"Victor left it with me, the last time he went through. He never trusted himself to keep it.\" He walked down the tunnel, tore the boards off the Horse Door and unlocked it. Behind it: mist, and the smell of grass.\n(Victor? Black Vulcano's real name, he says.)", "julia")
+		Game.current.say("Ulysses takes out an iron key with a horse's head, rips the boards off the Horse Door and turns the key. Mist rolls into the tunnel. \"All aboard.\"", "julia")
+	place(ulysses, "Ulysses", Vector3(10.5, 1, -18.5))
+	var board := Switch.new()
+	board.who = "julia"
+	board.flag = "b6.rick_ready"
+	board.requires = "b6.horse_open"
+	board.prompt = "Climb aboard the train"
+	board.on_used = func(_p: Node3D) -> void:
+		GameState.add_journal("aboard", "Rick: through the Horse Door",
+			"Ulysses opened the regulator, the Train of Eternal Youth shrieked, and we rolled down the tunnel straight at the open Horse Door, and through it, into the mist.\nHang on, Julia. We're coming.", "julia")
+		Game.current.say("The whistle shrieks, the wheels bite, and the Train of Eternal Youth plunges through the Horse Door into the mist...", "julia")
+	place(board, "BoardTrain", Vector3(7.2, 1, -19.4))

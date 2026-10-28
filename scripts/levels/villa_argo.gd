@@ -128,6 +128,9 @@ func _hear_footsteps() -> void:
 
 
 func _talk_nestor(_player: Node3D) -> void:
+	if GameState.get_flag("b6.photo", false) and not GameState.get_flag("b6.met_ulysses", false):
+		_ulysses()
+		return
 	if GameState.get_flag("b2.home", false) and not GameState.get_flag("b3.started", false):
 		_breakfast()
 		return
@@ -158,6 +161,7 @@ func _build_courtyard() -> void:
 	exit.level = KILMORE_COVE
 	exit.requires = "item:receipt"
 	exit.prompt = "Cycle down to Kilmore Cove"
+	exit.solo_when = "b6.playing_rick"
 	place(exit, "GateToKilmoreCove", Vector3(0, 1, 25))
 
 	# Statue of a woman mending a fishing net (canon, ref §5).
@@ -165,8 +169,7 @@ func _build_courtyard() -> void:
 	statue.name = "Statue"
 	add_label("statue: a woman mending a net", Vector3(-6, 2.6, 16.6), 0).font_size = 28
 
-	add_box(Vector3(5, 3, 5), Vector3(11, 1.5, 20), Color(0.55, 0.45, 0.35))
-	add_label("Nestor's cottage", Vector3(11, 3.4, 17.4), 0)
+	_build_cottage()
 
 	var nestor := Npc.new()
 	nestor.npc_name = "Nestor"
@@ -192,8 +195,11 @@ func _build_courtyard() -> void:
 		["b4.home", "Black Vulcano? Hmph. Drove the trains, years ago, when there were trains. Now get some sleep: it's school tomorrow, and your parents have written to the headteacher."],
 		["b5.started", "School. Go. And don't bring anything home I'll have to explain."],
 		["b5.oblivia_ahead", "Through the Door, the pair of them. Hmph. Be careful where it takes you. And come back."],
+		["b6.photo", "So. You've found me out, Rick Banner. Sit down before you fall down."],
+		["b6.met_ulysses", "Leonard first, at the lighthouse. He owes you the truth too. Then the station. Hurry."],
 	]
-	nestor.stations = [["", Vector3(4, 1, 17)], ["b2.split", Vector3(1.5, 1, 7)], ["b4.split", Vector3(10, 1, -8.6)], ["b4.nestor_free", Vector3(8, 1, -2)]]
+	nestor.stations = [["", Vector3(4, 1, 17)], ["b2.split", Vector3(1.5, 1, 7)], ["b4.split", Vector3(10, 1, -8.6)], ["b4.nestor_free", Vector3(8, 1, -2)], ["b6.photo", Vector3(10, 1, 19)]]
+	nestor.present = "!b6.nestor_away"
 	nestor.on_used = _talk_nestor
 	place(nestor, "Nestor", Vector3(4, 1, 17))
 
@@ -249,7 +255,7 @@ func _build_house() -> void:
 	var rick := Npc.new()
 	rick.npc_name = "Rick"
 	rick.color = Color(0.85, 0.4, 0.2)
-	rick.present = "argo.rick_here & !b2.away & !b4.away"
+	rick.present = "argo.rick_here & !b2.away & !b4.away & !b6.playing_rick"
 	rick.lines = [
 		["argo.rick_here", "I'm Rick, Rick Banner. Everybody in Kilmore Cove talks about this house. They say Ulysses Moore used to go down the cliff path behind the garden."],
 		["item:parchment", "Those symbols... There's a huge old dictionary in your library. Julia, you're good at this sort of thing."],
@@ -471,6 +477,120 @@ func _add_cracked_ledge(top: Vector3, color: Color) -> void:
 		crack.rotation_degrees.y = angle
 		Vis.make_private(crack, "julia")
 		add_child(crack)
+
+
+# --- Book 6: Rick and Nestor's cottage --------------------------------------------
+
+## Book 6 steps 5-7 (canon ✅: Rick breaks into Nestor's cottage and finds out
+## that Nestor is Ulysses Moore; an old photograph is part of it). What's inside,
+## the rain barrel, and matching the faces are adaptation. Played by Julia's
+## player as Rick, so everything here is for "julia" only.
+func _build_cottage() -> void:
+	var wood := Color(0.55, 0.45, 0.35)
+	add_box(Vector3(5, 3, 0.3), Vector3(11, 1.5, 22.5), wood)
+	add_box(Vector3(0.3, 3, 5), Vector3(8.5, 1.5, 20), wood)
+	add_box(Vector3(1.8, 3, 0.3), Vector3(9.4, 1.5, 17.5), wood)
+	add_box(Vector3(1.8, 3, 0.3), Vector3(12.6, 1.5, 17.5), wood)
+	add_box(Vector3(1.4, 0.6, 0.3), Vector3(11, 2.7, 17.5), wood)
+	add_box(Vector3(0.3, 3, 1.9), Vector3(13.5, 1.5, 18.45), wood)
+	add_box(Vector3(0.3, 3, 1.9), Vector3(13.5, 1.5, 21.55), wood)
+	add_box(Vector3(0.3, 1.2, 1.2), Vector3(13.5, 0.6, 20), wood)
+	add_box(Vector3(0.3, 0.8, 1.2), Vector3(13.5, 2.6, 20), wood)
+	add_box(Vector3(5.4, 0.3, 5.4), Vector3(11, 3.15, 20), Color(0.4, 0.3, 0.25))
+	add_label("Nestor's cottage", Vector3(11, 3.6, 17.3), 0)
+	add_label("back window", Vector3(13.7, 2.5, 20), -90).font_size = 22
+
+	var door := Door.new()
+	door.size = Vector3(1.4, 2.4, 0.2)
+	door.open_flag = "b6.cottage_open"
+	door.color = Color(0.3, 0.2, 0.12)
+	place(door, "CottageDoor", Vector3(11, 0, 17.5))
+
+	var barrel := Pushable.new()
+	barrel.who = "julia"
+	barrel.size = Vector3(0.8, 1.0, 0.8)
+	barrel.offset = Vector3(0, 0, 2)
+	barrel.moved_flag = "b6.barrel"
+	barrel.requires = "b6.playing_rick"
+	barrel.prompt = "Roll the rain barrel"
+	barrel.color = Color(0.35, 0.3, 0.25)
+	place(barrel, "RainBarrel", Vector3(14.6, 0.5, 18))
+	var window := Switch.new()
+	window.who = "julia"
+	window.flag = "b6.inside"
+	window.requires = "b6.barrel & b6.playing_rick"
+	window.prompt = "Climb in through the back window"
+	window.on_used = func(p: Node3D) -> void:
+		p.teleport.rpc(to_global(Vector3(12, 1, 20)), PI / 2)
+		Game.current.say("Up on the barrel, a shove at the window catch, and Rick tumbles into Nestor's cottage.", "julia")
+	place(window, "CottageWindow", Vector3(14.3, 1.6, 20))
+
+	var things := JournalNote.new()
+	things.who = "julia"
+	things.entry_who = "julia"
+	things.entry_id = "cottage"
+	things.title = "Rick: inside Nestor's cottage"
+	things.body = "Things a gardener shouldn't have: a captain's coat, salt-stained, on a hook behind the door. A ship in a bottle with METIS painted on its tiny bow. Sea charts of coasts that aren't on any map. A pair of walking sticks, though I've never seen him use one in the house."
+	things.prompt = "Look around"
+	things.size = Vector3(0.8, 1.2, 0.3)
+	place(things, "CottageThings", Vector3(9.2, 1, 22))
+	var letters := JournalNote.new()
+	letters.who = "julia"
+	letters.entry_who = "julia"
+	letters.entry_id = "letters_u"
+	letters.title = "Rick: letters signed U."
+	letters.body = "A bundle of letters tied with string, all in the same tall, slanted hand: the looping U, every t crossed twice. Julia said the captain's log on the Metis was written like that, and Ulysses Moore's diary. They're all signed \"U.\""
+	letters.prompt = "Untie the bundle of letters"
+	letters.size = Vector3(0.5, 0.15, 0.4)
+	place(letters, "Letters", Vector3(12.8, 1, 22))
+	add_box(Vector3(1.4, 0.8, 1), Vector3(11, 0.4, 21), WOOD)
+
+	var half := Switch.new()
+	half.who = "julia"
+	half.flag = "b6.photo_half"
+	half.requires = "b6.inside"
+	half.prompt = "Pick up the photo in the frame"
+	half.size = Vector3(0.3, 0.4, 0.05)
+	half.color = Color(0.85, 0.82, 0.7)
+	half.on_used = func(_p: Node3D) -> void:
+		GameState.add_journal("photo_half", "Rick: the other half",
+			"In a frame by Nestor's bed: half of an old photo, burned along one edge. The burn fits the edge of the half we brought back from the Isle of Masks exactly. The other half of the 1958 photo!", "julia")
+	place(half, "PhotoHalf", Vector3(9.2, 1.3, 18.3))
+
+	var join := ChoicePoint.new()
+	join.who = "julia"
+	join.requires = "b6.photo_half & !b6.photo"
+	join.prompt = "Put the two halves together"
+	join.reach = 1.8
+	join.question = "The Great Summer, 1958, whole again: a big young man in a railwayman's cap, hands black with coal dust; a thin one with round glasses and inky fingers; a girl holding a cat; a short one scowling under bushy eyebrows, a knife on his belt; and a tall one in a sailor's jersey, a ring on his left hand and a pale line across the back of it. On the back, half burned: \"...ano, P.D., C.B., L.M., U.M.\" Which of them is Nestor?"
+	join.options_for = func() -> Array:
+		return [["The big one in the railwayman's cap", true], ["The thin one with round glasses", true],
+			["The short one scowling under bushy eyebrows", true], ["The tall one in the sailor's jersey", true]]
+	join.on_choice = func(_p: Node3D, choice: String) -> void:
+		if choice != "The tall one in the sailor's jersey":
+			Game.current.say("Rick looks again... no. Whatever else Nestor is, that's not him. Check what you know about him.", "julia")
+			return
+		_reveal()
+	place(join, "JoinPhoto", Vector3(11, 1, 20.3))
+
+
+## Host: Rick sees it (canon ✅). The face-matching is adaptation.
+func _reveal() -> void:
+	GameState.set_flag("b6.photo")
+	GameState.set_flag("b6.nestor_away", false)
+	GameState.add_journal("nestor_is_ulysses", "Rick: Nestor is Ulysses Moore",
+		"The tall young man in the sailor's jersey has a ring with a little anchor on his left hand, and a pale scar across the back of it. Nestor's ring. Nestor's scar. And on the back of the photo, under him: U.M.\nNestor, the gardener, is Ulysses Moore.\nHe's been at Villa Argo the whole time, watching Jason and Julia open his Doors.", "julia")
+	Game.current.say("The ring with the anchor. The scar across the hand. U.M. ...Nestor IS Ulysses Moore. Behind you, the door creaks open. Nestor is standing in it.", "julia")
+
+
+## Host: Ulysses Moore explains, in a few words (canon: he disguised himself;
+## the why is partly adaptation).
+func _ulysses() -> void:
+	GameState.set_flag("b6.met_ulysses")
+	GameState.set_flag("b6.cottage_open")
+	GameState.add_journal("ulysses", "Rick: Ulysses Moore",
+		"He didn't deny it. \"Ulysses Moore died, as far as the world's concerned. It was easier. People came looking for the Doors, people like that Newton woman, and an old gardener nobody looks at twice can keep watch over a house. And I wanted to see whether the twins were the right ones to find them. They are.\"\nThen: \"Go and see Leonard Minaxo at the lighthouse. There's something he should have told you years ago. Then meet me at the station. I have the Horse key. We're going to get them back.\"", "julia")
+	Game.current.say("Nestor doesn't deny it. \"Yes. I'm Ulysses Moore.\" He opens the door. \"Lighthouse first, Rick: Leonard owes you the truth. Then the station.\"", "julia")
 
 
 # --- Book 5: the new goal -----------------------------------------------------------

@@ -5,6 +5,8 @@ extends CharacterBody3D
 const COLORS := {"jason": Color(0.25, 0.5, 0.9), "julia": Color(0.95, 0.55, 0.2)}
 ## Local clothes in Punt (book 2), while GameState flag "punt.disguised" is set.
 const DISGUISED_COLORS := {"jason": Color(0.85, 0.8, 0.65), "julia": Color(0.9, 0.85, 0.7)}
+## Book 6: while GameState flag "b6.playing_rick" is set, Julia's player plays Rick.
+const RICK_COLOR := Color(0.85, 0.3, 0.15)
 const GRAVITY := 20.0
 const MOUSE_SENS := 0.003
 const STICK_LOOK_SPEED := 2.5
@@ -16,6 +18,7 @@ var jump_velocity := 7.0
 
 var _pivot: Node3D
 var _body_mat: StandardMaterial3D
+var _tag: Label3D
 var _camera: Camera3D
 
 
@@ -54,10 +57,23 @@ func _build_body() -> void:
 	nose.position = Vector3(0, 0.5, -0.45)
 	add_child(nose)
 
+	_tag = Label3D.new()
+	_tag.text = "Rick"
+	_tag.position.y = 1.3
+	_tag.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	_tag.font_size = 40
+	add_child(_tag)
+	_update_color()
+
 
 func _update_color() -> void:
 	var colors := DISGUISED_COLORS if GameState.get_flag("punt.disguised", false) else COLORS
 	_body_mat.albedo_color = colors.get(role, Color.WHITE)
+	var rick: bool = role == "julia" and GameState.get_flag("b6.playing_rick", false)
+	if rick:
+		_body_mat.albedo_color = RICK_COLOR
+	if _tag:
+		_tag.visible = rick
 
 
 func _build_sync() -> void:

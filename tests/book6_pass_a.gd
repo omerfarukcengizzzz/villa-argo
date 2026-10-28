@@ -186,20 +186,23 @@ func _client() -> void:
 	await until(func() -> bool: return level_name() == "maze_town.tscn", "the maze-town (client)", 20)
 	await until(func() -> bool: return gs().get_flag("test.walk", false), "the way through", 40)
 	# The way Jason called out, cell by cell, walking for real between them.
-	var path := [[8, 5], [7, 5], [7, 4], [7, 3], [6, 3], [5, 3], [4, 3], [3, 3], [3, 4], [3, 5], [2, 5], [1, 5], [0, 5]]
+	var path := [[8, 5], [7, 5], [7, 4], [7, 3], [6, 3], [5, 3], [4, 3], [3, 3], [3, 4], [3, 5], [2, 5], [1, 5]]
 	var ok := true
+	# Walk slowly, so a long frame hitch can't carry Julia on into the square.
+	me().speed = 3.0
 	await move_me(cell(8, 5) + Vector3(0, 0, 1.5))
 	for step in path:
 		var target: Vector3 = cell(step[0], step[1])
 		var t := 0.0
-		while Vector2(local_pos().x - target.x, local_pos().z - target.z).length() > 0.4 and t < 4.0:
+		while Vector2(local_pos().x - target.x, local_pos().z - target.z).length() > 0.4 and t < 6.0:
 			var d: Vector3 = lvl().to_global(target) - me().global_position
 			me().rotation.y = atan2(-d.x, -d.z)
 			Input.action_press("move_forward")
 			await wait(0.05)
 			t += 0.05
 		Input.action_release("move_forward")
-		ok = ok and t < 4.0
+		ok = ok and t < 6.0
+	me().speed = 6.0
 	check(ok, "Julia walks the streets Jason called out")
 	await move_me(Vector3(0, 1, -29))
 	await wait(0.5)

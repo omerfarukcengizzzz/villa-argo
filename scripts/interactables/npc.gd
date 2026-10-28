@@ -74,7 +74,8 @@ func current_line() -> String:
 	return text
 
 
-func _host_interact(_player: Node3D) -> void:
+## While the twins are apart, only the one talking hears the answer.
+func _host_interact(player: Node3D) -> void:
 	var text := current_line()
 	if text != "":
-		Game.current.say("%s: %s" % [npc_name, text])
+		Game.current.say("%s: %s" % [npc_name, text], "both" if Game.current.together() else player.role)
