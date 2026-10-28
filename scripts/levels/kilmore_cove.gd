@@ -37,6 +37,7 @@ const MARKS := "368"
 var _ruins: Node3D
 var _dad_t := 0.0
 var _hid_t := 0.0
+var _turtle_key: Label3D
 
 
 func _build() -> void:
@@ -309,14 +310,14 @@ func _build_epilogue() -> void:
 	# wiser (canon: Fred has the First Key at the end of book 6, MEDIUM ✅; how
 	# he got it, LOW, isn't told).
 	add_box(Vector3(2, 0.5, 0.7), Vector3(-17, 0.25, -2), Color(0.4, 0.3, 0.2))
-	var key := Label3D.new()
-	key.text = "on Fred's key ring, among a hundred others:\na small key with three turtles"
-	key.position = Vector3(-17, 2.5, -1.2)
-	key.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	key.font_size = 22
-	add_child(key)
-	GameState.changed.connect(func(_k: String) -> void: key.visible = GameState.get_flag("b6.home", false))
-	key.visible = GameState.get_flag("b6.home", false)
+	_turtle_key = Label3D.new()
+	_turtle_key.text = "on Fred's key ring, among a hundred others:\na small key with three turtles"
+	_turtle_key.position = Vector3(-17, 2.5, -1.2)
+	_turtle_key.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	_turtle_key.font_size = 22
+	add_child(_turtle_key)
+	GameState.changed.connect(_show_turtle_key)
+	_show_turtle_key("")
 
 	# Minaxo and Calypso (decision 4: a full scene; LOW–MEDIUM, adaptation).
 	var nudge := ChoicePoint.new()
@@ -328,6 +329,10 @@ func _build_epilogue() -> void:
 		return [["Tell him to just say it", true], ["Tell Calypso he's been practising for forty years", true], ["Tactfully leave them to it", true]]
 	nudge.on_choice = func(_p: Node3D, choice: String) -> void: _minaxo_calypso(choice)
 	place(nudge, "NudgeMinaxo", Vector3(-29.4, 1, -29.4))
+
+
+func _show_turtle_key(_key: String) -> void:
+	_turtle_key.visible = GameState.get_flag("b6.home", false)
 
 
 ## Host: the lighthouse scene (LOW–MEDIUM: they're together by the end of

@@ -33,6 +33,7 @@ var _board: Node3D
 var _gauge: Label3D
 var _decay_t := 0.0
 var _boards: Array = []
+var _lamp: StaticBody3D
 
 
 func _init() -> void:
@@ -274,9 +275,9 @@ func _build_tunnel() -> void:
 		var rail := add_box(Vector3(0.12, 0.12, 30), Vector3(x, 0.06, -27), Color(0.35, 0.3, 0.28))
 		rail.get_child(1).disabled = true
 	add_label("platform 3", Vector3(4.1, 3, -14), 90).font_size = 30
-	var lamp := add_box(Vector3(0.4, 0.4, 0.2), Vector3(8, 5.4, -12.4), Color(0.2, 0.2, 0.2))
-	GameState.changed.connect(func(_k: String) -> void:
-		lamp.get_child(0).material_override = Vis.material(Color(0.2, 0.9, 0.3) if GameState.get_flag("station.route", false) else Color(0.2, 0.2, 0.2)))
+	_lamp = add_box(Vector3(0.4, 0.4, 0.2), Vector3(8, 5.4, -12.4), Color(0.2, 0.2, 0.2))
+	GameState.changed.connect(_show_lamp)
+	_show_lamp("")
 
 	# The locomotive, its cab at the south end.
 	add_box(Vector3(3, 3.2, 8), Vector3(8, 1.6, -24), Color(0.12, 0.13, 0.15))
@@ -331,6 +332,10 @@ func _build_tunnel() -> void:
 	door.prompt = "Look at the boarded-up door"
 	door.size = Vector3(0.01, 0.01, 0.01)
 	place(door, "HorseDoor", Vector3(8, 1, -40.2))
+
+
+func _show_lamp(_key: String) -> void:
+	_lamp.get_child(0).material_override = Vis.material(Color(0.2, 0.9, 0.3) if GameState.get_flag("station.route", false) else Color(0.2, 0.2, 0.2))
 
 
 func _show_gauge() -> void:
