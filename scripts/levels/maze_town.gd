@@ -38,11 +38,14 @@ const GUARD_ROUTE := [Vector3(0, 1, -20), Vector3(0, 1, -32), Vector3(0, 1, -44)
 const GUARD_X := [24.0, 38.0]
 const GUARD_SECONDS := 3.0
 const COURT_ENTRANCE := Vector3(19, 1, -32)
+const KILMORE_COVE := "res://scenes/levels/kilmore_cove.tscn"
+const PAVILION := Vector3(47, 1, -48)
 
 var _portcullis: StaticBody3D
 var _knot: Node3D
 var _split_t := 0.0
 var _guard_t := 0.0
+var _arrive_t := 0.0
 
 
 func _init() -> void:
@@ -52,6 +55,7 @@ func _init() -> void:
 func _build() -> void:
 	entries = {
 		"default": {"jason": Vector3(-1.2, 1, 10), "julia": Vector3(1.2, 1, 10), "yaw": 0.0},
+		"horse_door": {"jason": Vector3(-14, 1, -34.5), "julia": Vector3(-14, 1, -36), "yaw": -PI / 2},
 	}
 	add_environment(Color(0.75, 0.78, 0.7))
 	add_box(Vector3(36, 0.5, 60), Vector3(0, -0.25, -17), Color(0.55, 0.5, 0.42))
@@ -67,6 +71,7 @@ func _build() -> void:
 	_build_watchtower()
 	_build_square()
 	_build_court()
+	_build_reunion()
 	GameState.changed.connect(_on_state_changed)
 	_on_state_changed("")
 
@@ -153,7 +158,7 @@ func _build_square() -> void:
 	manfred.npc_name = "Manfred"
 	manfred.color = Color(0.2, 0.2, 0.2)
 	manfred.who = "nobody"
-	manfred.present = "b6.caught"
+	manfred.present = "b6.caught & !b6.knot_cut"
 	place(manfred, "Manfred", Vector3(2.5, 1, -34))
 
 
@@ -161,9 +166,13 @@ func _on_state_changed(_key: String) -> void:
 	var up: bool = GameState.get_flag("maze.portcullis", false)
 	_portcullis.visible = not up
 	_portcullis.get_child(1).disabled = up
-	_knot.visible = GameState.get_flag("b6.caught", false)
+	var cut: bool = GameState.get_flag("b6.knot_cut", false)
+	_knot.visible = GameState.get_flag("b6.caught", false) and not cut
+	var door: StaticBody3D = get_node("TowerDoor")
+	door.visible = not cut
+	door.get_child(1).disabled = cut
 	var gate: StaticBody3D = get_node("CourtGate")
-	var open: bool = GameState.get_flag("b6.playing_rick", false)
+	var open: bool = GameState.get_flag("b6.playing_rick", false) or cut
 	gate.visible = not open
 	gate.get_child(1).disabled = open
 
@@ -173,7 +182,7 @@ func _physics_process(delta: float) -> void:
 		return
 	if not GameState.get_flag("b6.caught", false):
 		for p in Game.current.get_players():
-			if p.role == "julia" and Game.current.level_for("julia") == self and to_local(p.global_position).z < -27.0:
+			if p.role == "julia" and Game.current.level_for("julia") == self and _in_square(to_local(p.global_position)):
 				_caught(p)
 		return
 	if not GameState.get_flag("b6.playing_rick", false):
@@ -181,7 +190,19 @@ func _physics_process(delta: float) -> void:
 		if _split_t > 6.0:
 			_start_split()
 		return
-	_run_guards(delta)
+	if GameState.get_flag("b6.rick_ready", false) and not GameState.get_flag("b6.arrived", false):
+		_arrive_t += delta
+		if _arrive_t > 3.0:
+			_arrive()
+	if not GameState.get_flag("b6.knot_cut", false):
+		_run_guards(delta)
+
+
+## The bell-tower square. Checked by its bounds, not just "north of the
+## streets": right after a level change the host can briefly still have a twin
+## at her old level's position.
+static func _in_square(at: Vector3) -> bool:
+	return absf(at.x) < 17.0 and at.z < -27.0 and at.z > -47.0 and absf(at.y - 1.0) < 3.0
 
 
 ## Step 3 (adaptation): Manfred grabs Julia and locks her in the bell tower.
@@ -247,9 +268,13 @@ func _build_court() -> void:
 		["", "Hm? A boy? Out here?"],
 		["b6.met_vulcano", "A knot nobody can untie. Think, boy. What did Alexander do?"],
 	]
-	vulcano.on_used = func(_p: Node3D) -> void:
+	vulcano.lines.append(["b6.knot_cut", "Ulysses. After all these years. Come here, you old pirate."])
+	vulcano.lines.append(["b6.truth", "I'm staying. This garden suits an old man. Go home, all of you."])
+	vulcano.on_used = func(p: Node3D) -> void:
 		if GameState.get_flag("b6.playing_rick", false) and not GameState.get_flag("b6.met_vulcano", false):
 			_vulcano_truth()
+		elif GameState.get_flag("b6.knot_cut", false) and not GameState.get_flag("b6.truth", false):
+			_try_truth(p)
 	place(vulcano, "BlackVulcano", Vector3(47, 1, -48))
 
 	# The knot on Julia's tower door.
@@ -294,3 +319,135 @@ func _vulcano_truth() -> void:
 	GameState.add_journal("gordian", "The Gordian knot",
 		"Black Vulcano knows the knot on Julia's door. \"Prester John's guards tie it. Nobody has ever untied one. There was a king once, Alexander, who met a knot like that. He didn't untie it at all.\"\nHe cut it. I need a blade.", "jason")
 	Game.current.say("Black Vulcano: \"The First Key? I never had it. None of us ever found it.\" ...And Oblivia Newton is his daughter.", "jason")
+
+
+
+# --- Book 6 steps 13-15: the reunion, the Gordian knot, the truth -----------------
+
+func _build_reunion() -> void:
+	# The Horse Door, from the Garden's side, in the west wall of the square.
+	add_box(Vector3(0.3, 4, 3), Vector3(-16.7, 2, -36), Color(0.3, 0.22, 0.15))
+	add_label("the Horse Door", Vector3(-16.5, 4.6, -36), 90).font_size = 30
+	var home := LevelExit.new()
+	home.level = KILMORE_COVE
+	home.entry = "station"
+	home.requires = "b6.truth"
+	home.prompt = "Board the train home"
+	home.on_used = func(_p: Node3D) -> void:
+		GameState.set_flag("b6.home")
+		Game.current.say("The Train of Eternal Youth carries everyone back through the Horse Door: the twins, Rick, Ulysses Moore, a sulking Oblivia Newton and a strangely cheerful Manfred. Black Vulcano waves from the platform of the Garden. Then: Kilmore Cove.")
+	place(home, "TrainHome", Vector3(-14.5, 1, -38))
+
+	var ulysses := Npc.new()
+	ulysses.npc_name = "Ulysses Moore"
+	ulysses.color = Color(0.45, 0.4, 0.3)
+	ulysses.present = "b6.arrived & !b6.home"
+	ulysses.walk_speed = 3.0
+	ulysses.stations = [["", Vector3(-13, 1, -38.5)], ["b6.knot_cut", PAVILION + Vector3(-1.8, 0, 2.5)]]
+	ulysses.lines = [
+		["b6.arrived", "Yes, Jason. It's me. Nestor, Ulysses: both. I'll explain everything, I promise. First, your sister."],
+		["b6.knot_cut", "Victor's in the court. Come. It's time we all told the truth."],
+		["b6.truth", "Home, then. The train won't wait for ever."],
+	]
+	place(ulysses, "Ulysses", Vector3(-13, 1, -38.5))
+
+	var rick := Npc.new()
+	rick.npc_name = "Rick"
+	rick.color = Color(0.85, 0.4, 0.2)
+	rick.present = "b6.knot_cut & !b6.home"
+	rick.walk_speed = 4.0
+	rick.stations = [["", Vector3(2.5, 1, -33.5)], ["b6.truth", Vector3(-12.5, 1, -36.5)]]
+	rick.lines = [
+		["b6.knot_cut", "Julia! Are you all right? ...Good. Good. You should've seen Jason's face when Nestor got off the train."],
+		["b6.truth", "Home. I never thought I'd be so glad to see Kilmore Cove."],
+	]
+	place(rick, "Rick", Vector3(2.5, 1, -33.5))
+
+	# Rick reads the legend; Jason cuts the knot.
+	var legend := JournalNote.new()
+	legend.who = "julia"
+	legend.entry_who = "julia"
+	legend.requires = "b6.arrived & !b6.knot_cut"
+	legend.entry_id = "knot_legend"
+	legend.title = "Rick: the Gordian knot"
+	legend.body = "Carved over the tower door, in old letters (Ulysses translated): the story of the knot of Gordium. Whoever undid it would rule all Asia, and for years nobody could even find its ends. Then Alexander came. He didn't pick at it. He drew his sword and cut it straight through the middle, in a single stroke.\nJason needs to know that: one stroke, through the middle."
+	legend.prompt = "Read the words over the tower door"
+	legend.size = Vector3(0.01, 0.01, 0.01)
+	place(legend, "KnotLegend", Vector3(-1.5, 1, -35.8))
+	var blade := Pickup.new()
+	blade.who = "jason"
+	blade.item_id = "blade"
+	blade.item_name = "a guard's sword"
+	blade.requires = "b6.knot_known & !b6.knot_cut"
+	blade.prompt = "Take a sword from the rack"
+	blade.box_size = Vector3(0.1, 1.0, 0.1)
+	blade.color = Color(0.75, 0.75, 0.8)
+	place(blade, "Sword", Vector3(49, 1.2, -14.6))
+	add_box(Vector3(1.6, 1.4, 0.3), Vector3(49, 0.7, -12.5), Color(0.35, 0.25, 0.15))
+	add_label("the guards' sword rack", Vector3(49, 2.4, -12.7), 180).font_size = 24
+	var cut := ChoicePoint.new()
+	cut.who = "jason"
+	cut.requires = "item:blade & !b6.knot_cut"
+	cut.prompt = "Cut the knot"
+	cut.reach = 2.0
+	cut.question = "The sword is heavy in your hands. How do you cut the knot?"
+	cut.options_for = func() -> Array:
+		return [["Saw carefully at the outside loops", true], ["Straight through the middle, in one stroke", true], ["Hack at it as hard as you can, again and again", true]]
+	cut.on_choice = func(_p: Node3D, choice: String) -> void:
+		if choice != "Straight through the middle, in one stroke":
+			Game.current.say("The rope only seems to pull tighter, as if the knot is alive. There has to be a right way. Ask Rick: what did Alexander do?", "jason")
+			return
+		_free_julia()
+	place(cut, "CutKnot", Vector3(1.2, 1, -35.8))
+
+	for who in [["Oblivia Newton", Color(0.6, 0.1, 0.3), PAVILION + Vector3(2.2, 0, 2.6)], ["Manfred", Color(0.2, 0.2, 0.2), PAVILION + Vector3(3.6, 0, 3.4)]]:
+		var npc := Npc.new()
+		npc.npc_name = who[0]
+		npc.color = who[1]
+		npc.who = "nobody"
+		npc.present = "b6.knot_cut & !b6.home"
+		place(npc, "Court" + who[0].split(" ")[0], who[2])
+
+
+## Host: the train comes out of the Horse Door into the square (canon:
+## Ulysses and Rick arrive through the station Door, MEDIUM ✅).
+func _arrive() -> void:
+	GameState.set_flag("b6.arrived")
+	Game.current.move_twin("julia", "res://scenes/levels/maze_town.tscn", "horse_door")
+	Game.current.say("With a shriek of steam, a train bursts out of a door in the wall of the square: the Train of Eternal Youth! Rick jumps down. And behind him, stiff and limping, Nestor. \"Hello, Jason. It's time you knew. My name is Ulysses Moore.\"", "jason")
+	Game.current.say("The train bursts out of the Horse Door into a square full of crooked houses, and there's Jason, staring. Not at you: at Nestor. You'd give anything for a camera.", "julia")
+	GameState.add_journal("ulysses_jason", "Nestor is Ulysses Moore",
+		"A train came out of the wall, the Train of Eternal Youth, with Rick on it. And Nestor. Nestor, our gardener, who said the Door led to a cistern. He's Ulysses Moore. He's been at Villa Argo all along, watching us find his Doors.\nRick found out by breaking into his cottage. Of course he did.", "jason")
+
+
+## Host: Jason cuts the knot the way Alexander did (the knot's use is
+## adaptation). Julia's player is Julia again; Rick is back to being Rick.
+func _free_julia() -> void:
+	GameState.set_flag("b6.knot_cut")
+	GameState.set_flag("b6.playing_rick", false)
+	GameState.take_item("blade")
+	var julia: Node3D = null
+	for p in Game.current.get_players():
+		if p.role == "julia":
+			julia = p
+	if julia:
+		julia.teleport.rpc(to_global(Vector3(0, 1, -38.5)), PI)
+	GameState.share_journal()
+	GameState.add_journal("reunited", "Together again",
+		"One stroke, straight through the middle, the way Alexander did it, and the Gordian knot fell apart. Julia walked out of the bell tower, Rick grinned like an idiot, and Nestor (Ulysses!) put a hand on each of our shoulders.\nWe've told each other everything now: the cottage, the photo, Rick's father, Black Vulcano, the First Key that nobody ever found.")
+	Game.current.say("One stroke, straight through the middle, and the Gordian knot falls to pieces. The tower door swings open: Julia is free! You're JULIA again. Black Vulcano is waiting in the court, and so, it seems, are Oblivia and Manfred.")
+
+
+## Host: everyone at Black Vulcano's pavilion (canon: Black Vulcano never had
+## the First Key, MEDIUM; Oblivia is his daughter ✅; Manfred leaves her for
+## Gwendaline, ✅; decision 3: Black Vulcano stays in the Garden).
+func _try_truth(player: Node3D) -> void:
+	var near := Game.current.get_players().all(func(p: Node3D) -> bool:
+		return Game.current.level_for(p.role) == self and to_local(p.global_position).distance_to(PAVILION) < 8.0)
+	if Game.current.get_players().size() < 2 or not near:
+		Game.current.say("Black Vulcano: \"Not yet. I want both of you here for this. Fetch your sister, boy.\"" if player.role == "jason" else "Black Vulcano: \"Not yet. Where's your brother? I want both of you here for this.\"", player.role)
+		return
+	GameState.set_flag("b6.truth")
+	GameState.add_journal("truth", "The truth",
+		"Under Black Vulcano's pavilion, everyone at once: Ulysses Moore and Black Vulcano, old friends from the Great Summer of 1958, shaking hands as if they'd never stop; Oblivia Newton, white with anger; Manfred, looking at his shoes.\nThe truth, all of it: nobody ever found the First Key. Not Black Vulcano, not Ulysses, not Peter Dedalus, not Rick's father, who died looking for it. Everybody just believed somebody else had it.\nAnd Oblivia is Black Vulcano's daughter. All this time, she was chasing her own father, and a key that doesn't exist.\nManfred cleared his throat and told Oblivia he quits. He has a hairdresser to see in Kilmore Cove.\nBlack Vulcano is staying here. \"The Garden suits an old man.\" The train is waiting at the Horse Door, to take everyone else home.")
+	Game.current.say("Black Vulcano and Ulysses Moore, face to face after all these years. Then the truth: nobody ever found the First Key. And Oblivia Newton is Black Vulcano's daughter. Manfred clears his throat: \"Miss Newton? I quit.\"")

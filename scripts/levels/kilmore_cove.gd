@@ -61,6 +61,7 @@ func _build() -> void:
 	_build_mirror_house()
 	_build_school_town()
 	_build_rick()
+	_build_epilogue()
 
 
 # --- Main street and post office (book 1) ----------------------------------------
@@ -206,7 +207,8 @@ func _build_square() -> void:
 		["b3.dedalus", "If anyone could find out where Peter went, it's you three."],
 		["b3.escaped", "Thank goodness you're safe. Peter's house... Well, houses can be mended. People are harder."],
 	]
-	calypso.stations = [["", Vector3(-20, 1, -7)], ["b3.escaped", Vector3(34, 1, -11)]]
+	calypso.lines.append(["b6.home", "Oh! You're back! Leonard said... Leonard and I were just talking. About nothing. Nothing at all."])
+	calypso.stations = [["", Vector3(-20, 1, -7)], ["b3.escaped", Vector3(34, 1, -11)], ["b5.started", Vector3(-20, 1, -7)], ["b6.home", Vector3(-28.4, 1, -30.2)]]
 	calypso.on_used = _talk_calypso
 	place(calypso, "Calypso", Vector3(-20, 1, -7))
 
@@ -290,6 +292,85 @@ func _great_summer() -> void:
 	Game.current.say("Walking back past the square... that's Dad! What's he doing in Kilmore Cove? If he sees you, you're done for. Chubber's pastry shop, quick!", "jason")
 
 
+# --- Book 6 step 16: the epilogue ------------------------------------------------
+
+func _build_epilogue() -> void:
+	# Manfred and Gwendaline, off to Punt through Miss Biggles's Cat Door
+	# (canon ✅, two wikis).
+	for who in [["Manfred", Color(0.2, 0.2, 0.2), Vector3(-26.5, 1, 8.6)], ["Gwendaline Mainoff", Color(0.9, 0.5, 0.7), Vector3(-25.3, 1, 9.4)]]:
+		var npc := Npc.new()
+		npc.npc_name = who[0]
+		npc.color = who[1]
+		npc.who = "nobody"
+		npc.present = "b6.home & !b6.manfred_gone"
+		place(npc, "Epilogue" + who[0].split(" ")[0], who[2])
+
+	# Fred asleep on a bench, with the First Key on his ring and nobody the
+	# wiser (canon: Fred has the First Key at the end of book 6, MEDIUM ✅; how
+	# he got it, LOW, isn't told).
+	add_box(Vector3(2, 0.5, 0.7), Vector3(-17, 0.25, -2), Color(0.4, 0.3, 0.2))
+	var key := Label3D.new()
+	key.text = "on Fred's key ring, among a hundred others:\na small key with three turtles"
+	key.position = Vector3(-17, 2.5, -1.2)
+	key.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	key.font_size = 22
+	add_child(key)
+	GameState.changed.connect(func(_k: String) -> void: key.visible = GameState.get_flag("b6.home", false))
+	key.visible = GameState.get_flag("b6.home", false)
+
+	# Minaxo and Calypso (decision 4: a full scene; LOW–MEDIUM, adaptation).
+	var nudge := ChoicePoint.new()
+	nudge.requires = "b6.home & !b6.minaxo_calypso"
+	nudge.prompt = "Give Mr Minaxo a push"
+	nudge.reach = 2.4
+	nudge.question = "Mr Minaxo is turning his cap round and round in his hands. Calypso is pretending to look at the sea. What do you do?"
+	nudge.options_for = func() -> Array:
+		return [["Tell him to just say it", true], ["Tell Calypso he's been practising for forty years", true], ["Tactfully leave them to it", true]]
+	nudge.on_choice = func(_p: Node3D, choice: String) -> void: _minaxo_calypso(choice)
+	place(nudge, "NudgeMinaxo", Vector3(-29.4, 1, -29.4))
+
+
+## Host: the lighthouse scene (LOW–MEDIUM: they're together by the end of
+## book 6; the scene is adaptation).
+func _minaxo_calypso(choice: String) -> void:
+	GameState.set_flag("b6.minaxo_calypso")
+	var opening := {
+		"Tell him to just say it": "\"Just say it, Mr Minaxo!\" He glares at you. Then he takes a deep breath.",
+		"Tell Calypso he's been practising for forty years": "\"He's been practising for forty years, Calypso.\" Minaxo goes purple. Calypso laughs, then stops laughing, and looks at him.",
+		"Tactfully leave them to it": "You start to tiptoe away, very tactfully, and fall over a lobster pot. In the silence after the crash, Minaxo clears his throat.",
+	}
+	Game.current.say(opening.get(choice, opening["Tell him to just say it"]))
+	Game.current.say_later("Minaxo: \"Calypso. I'm an old fool with one lighthouse and a bad temper. I should have asked you this in 1958. Will you... would you... have dinner with me?\"", 3.0)
+	Game.current.say_later("Calypso: \"Leonard Minaxo. I have been waiting for you to ask me that since I was seventeen.\" She takes his arm.", 6.5)
+	GameState.add_journal("minaxo_calypso", "The lighthouse",
+		"Mr Minaxo, who once told us a lighthouse is not a playground, stood at the bottom of his lighthouse turning his cap round and round, and finally asked Calypso to dinner. She said she'd been waiting since she was seventeen.\nThey walked off along the headland arm in arm, and he didn't even tell us to clear off.")
+
+
+func _run_epilogue() -> void:
+	if not GameState.get_flag("b6.home", false) or GameState.get_flag("b6.end", false):
+		return
+	if not GameState.get_flag("b6.manfred_gone", false):
+		for p in Game.current.get_players():
+			var at := to_local(p.global_position)
+			if Game.current.level_for(p.role) == self and absf(at.y - 1.0) < 3.0 and at.distance_to(Vector3(-26, 1, 9)) < 7.0:
+				_manfred_goes()
+				break
+	if ["b6.manfred_gone", "b6.julia_rick", "b6.minaxo_calypso"].all(func(f: String) -> bool: return GameState.get_flag(f, false)):
+		GameState.set_flag("b6.end")
+		GameState.add_journal("the_end", "The First Key",
+			"Kilmore Cove, the morning after. Ulysses Moore is back in his gardener's hat, grumbling at the roses as if nothing had happened, but he lets us call him Ulysses when nobody's listening. Oblivia Newton has gone back to her house on the hill to sulk. Black Vulcano stayed in the Garden.\nNobody has the First Key. Nobody ever did.\nFred is asleep on the bench in the square, as usual, with his enormous ring of keys in his lap.\nThe Doors are still there, all of them. Somebody has to keep them safe. Ulysses says it might as well be us.")
+		Game.current.say_later("End of book 6: The First Key. Thank you for playing Ulysses Moore, books 1 to 6. (Look closely at Fred's key ring.)", 4.0)
+
+
+## Manfred leaves Oblivia for Gwendaline the hairdresser and takes her to Punt
+## through the Cat Door (canon ✅, LOW–MEDIUM on the details).
+func _manfred_goes() -> void:
+	GameState.set_flag("b6.manfred_gone")
+	GameState.add_journal("manfred_punt", "Manfred and Gwendaline",
+		"By Miss Biggles's house: Manfred, in a clean shirt, holding hands with Gwendaline the hairdresser. He tipped his cap to us, very politely, and the two of them went into Miss Biggles's house. Through the window we saw them open the door with the cat on it, and walk through, into the sunshine of Punt.\nGwendaline says she's going to open a beauty salon there.")
+	Game.current.say("Manfred, in a clean shirt, hand in hand with Gwendaline the hairdresser, tips his cap to you. The pair of them walk into Miss Biggles's house... and out through the Cat Door, into the sunshine of Punt.")
+
+
 ## Book 6 step 8 (canon MEDIUM ✅: Rick's father died searching for the First
 ## Key, with Minaxo). The scene is adaptation; for Rick (Julia's player) only.
 func _rick_father() -> void:
@@ -349,6 +430,8 @@ func _build_school_town() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if multiplayer.is_server():
+		_run_epilogue()
 	if not multiplayer.is_server() or not GameState.get_flag("b5.dad_walk", false) or GameState.get_flag("b5.dad_gone", false):
 		return
 	var jason := Game.current.get_player(1)
@@ -417,11 +500,12 @@ func _build_town_hall() -> void:
 	fred.npc_name = "Fred Dormiveglia"
 	fred.color = Color(0.55, 0.5, 0.4)
 	fred.walk_speed = 1.5
-	fred.stations = [["", Vector3(16, 1, -6.8)], ["b5.station_open", Vector3(20, 1, 4)]]
+	fred.stations = [["", Vector3(16, 1, -6.8)], ["b5.station_open", Vector3(20, 1, 4)], ["b6.home", Vector3(-17, 1, -1.2)]]
 	fred.lines = [
 		["", "*yaaawn* Town hall's closed for lunch. Or... is it open? Come back later."],
 		["b5.recovered", "Clark Beamish Station? Nobody's asked for that in years. Yes, yes, I've got the keys. I've got all the keys. Come along, then... slowly."],
 		["b5.station_open", "There you are, all open. Mind the birds. I'll be inside, resting my eyes."],
+		["b6.home", "Zzzz... hm? Oh, it's you. Back from wherever it was. Zzzz..."],
 	]
 	fred.on_used = func(_p: Node3D) -> void:
 		if GameState.get_flag("b5.recovered", false) and not GameState.get_flag("b5.station_open", false):
@@ -510,6 +594,7 @@ func _build_rick() -> void:
 		["b3.dedalus", Vector3(31, 1, -14)],
 		["b3.escaped", Vector3(30, 1, -12)],
 		["b5.recovered", Vector3(14, 1, -5.5)],
+		["b6.home", Vector3(-21, 1, 4)],
 	]
 	rick.lines = [
 		["b3.started", "Let's make a list of everything that's strange about this place. I've lived here all my life and I never noticed. The bookshop has atlases, there's the phone box, the old railway, and that statue in the square..."],
@@ -521,5 +606,13 @@ func _build_rick() -> void:
 		["b5.recovered", "Fred's at the town hall. He's got the keys to everything in Kilmore Cove... if you can keep him awake long enough."],
 		["b5.station_open", "The station! I've never been inside. Nobody has, not for years."],
 		["b5.train_awake", "Back to Argo. Nestor needs to hear about this."],
+		["b6.home", "So, um. Julia. Do you want to go for a walk? Along the harbour. Just a walk."],
+		["b6.julia_rick", "Tomorrow, then. The harbour. ...Stop grinning, Jason."],
 	]
+	rick.on_used = func(p: Node3D) -> void:
+		if p.role == "julia" and GameState.get_flag("b6.home", false) and not GameState.get_flag("b6.julia_rick", false):
+			GameState.set_flag("b6.julia_rick")
+			GameState.add_journal("julia_rick", "A walk along the harbour",
+				"Rick went red to the roots of his red hair and asked me to go for a walk along the harbour. Just a walk. I said yes.\nJason pretended to be sick into a flowerbed. He's going to be unbearable about this.")
+			Game.current.say("Julia says yes. Rick turns the colour of his hair. Behind them, Jason pretends to be sick into a flowerbed.")
 	place(rick, "Rick", Vector3(2.5, 1, 6))

@@ -333,7 +333,8 @@ func _check_cloister(delta: float) -> void:
 		return
 	var twins := Game.current.get_players()
 	if twins.size() < 2 or not twins.all(func(p: Node3D) -> bool:
-			return Game.current.level_for(p.role) == self and to_local(p.global_position).z < -52.5):
+			var at := to_local(p.global_position)
+			return Game.current.level_for(p.role) == self and absf(at.x) < 12.0 and at.z < -52.5 and at.z > -72.0 and absf(at.y - 1.0) < 3.0):
 		return
 	GameState.set_flag("b5.cloister")
 	GameState.add_journal("cloister", "The cloister",
